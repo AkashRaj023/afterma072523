@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AppView, UserProfile, HealthLog, RecoveryActivity, RecoveryPhase, Appointment, CommunityCircle } from './types';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const lastClickRef = useRef<number>(0);
   
   // Care Connect States
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -116,6 +117,16 @@ const App: React.FC = () => {
 
   const triggerSOS = () => setShowSOS(true);
 
+  const handleSOSClick = () => {
+    const currentTime = Date.now();
+    const timeSinceLastClick = currentTime - lastClickRef.current;
+    
+    if (timeSinceLastClick < 300) { // Double tap threshold 300ms
+      triggerSOS();
+    }
+    lastClickRef.current = currentTime;
+  };
+
   const filteredActivities = useMemo(() => {
     return RECOVERY_DATABASE
       .filter(a => !a.typeSpecific || a.typeSpecific === profile.deliveryType)
@@ -176,22 +187,10 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-3 lg:gap-6">
             <button 
-              onMouseDown={(e) => {
-                const timer = setTimeout(triggerSOS, 1500);
-                const clear = () => clearTimeout(timer);
-                e.currentTarget.addEventListener('mouseup', clear);
-                e.currentTarget.addEventListener('mouseleave', clear);
-                // Touch events for mobile
-                e.currentTarget.addEventListener('touchend', clear);
-              }}
-              onTouchStart={(e) => {
-                const timer = setTimeout(triggerSOS, 1500);
-                const clear = () => clearTimeout(timer);
-                e.currentTarget.addEventListener('touchend', clear);
-              }}
+              onClick={handleSOSClick}
               className="px-4 lg:px-6 py-2 lg:py-2.5 bg-[#EF4444] text-white rounded-full font-black text-[9px] lg:text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-red-100/50"
             >
-              SOS
+              Double tap for SOS
             </button>
             
             {profile.authenticated ? (
