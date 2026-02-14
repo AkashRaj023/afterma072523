@@ -24,7 +24,8 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
   const t = translations[lang];
   const [inspiration, setInspiration] = useState(t.dashboard.inspiration);
   const lastLog = logs[logs.length - 1];
-  const theme = COLORS[profile.accent] || COLORS.pink;
+  // Fix: Property 'pink' does not exist on type COLORS, changed to 'PINK'
+  const theme = COLORS[profile.accent] || COLORS.PINK;
 
   useEffect(() => {
     const fetchInspiration = async () => {

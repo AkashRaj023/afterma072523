@@ -1,11 +1,10 @@
 
-import React, { useState, useRef } from 'react';
-import { UserProfile, RecoveryPace, ThemeAccent, Language } from '../types';
-// Added Zap to the import list to fix the missing name error
+import React, { useState, useRef, useEffect } from 'react';
+import { UserProfile, ThemeAccent, Language } from '../types';
 import { 
-  Save, User, Shield, Palette, Target, 
-  Lock, Eye, Check, Trash2, Camera, Upload, Bell,
-  Activity, Users, Clipboard, Calendar, Heart, Clock, Focus, Zap
+  Save, User, Palette, Target, 
+  Lock, Eye, Check, Camera, Upload, Bell,
+  Activity, Users, Clipboard, Calendar, Heart, Clock, Zap
 } from 'lucide-react';
 import { COLORS } from '../constants';
 import { translations } from '../translations';
@@ -18,37 +17,53 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'journey' | 'custom' | 'notifications' | 'privacy'>('profile');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [localCommitment, setLocalCommitment] = useState(15);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
 
+  useEffect(() => {
+    setLocalCommitment(15);
+  }, []);
+
   const updateProfile = (fields: Partial<UserProfile>) => {
     setProfile(prev => ({ ...prev, ...fields }));
   };
 
+  const updateCaregiver = (fields: any) => {
+    setProfile(prev => ({
+      ...prev,
+      caregiver: { ...prev.caregiver, ...fields }
+    }));
+  };
+
+  const updateCaregiverPermissions = (key: string, value: boolean) => {
+    setProfile(prev => ({
+      ...prev,
+      caregiver: {
+        ...prev.caregiver,
+        permissions: { ...prev.caregiver.permissions, [key]: value }
+      }
+    }));
+  };
+
+  const updateNotifications = (key: string, value: boolean) => {
+    setProfile(prev => ({
+      ...prev,
+      notifications: { ...prev.notifications, [key]: value }
+    }));
+  };
+
   const changeAccent = (key: ThemeAccent) => {
     if (profile.accent === key) return;
-    
-    // Trigger transition animation
     setIsTransitioning(true);
     setTimeout(() => {
       updateProfile({ accent: key });
-    }, 400); // Change mid-animation
-    
+    }, 400);
     setTimeout(() => {
       setIsTransitioning(false);
     }, 1200);
-  };
-
-  const toggleGoal = (goalKey: string) => {
-    setProfile(prev => {
-      const currentGoals = prev.journeySettings.goals || [];
-      const newGoals = currentGoals.includes(goalKey)
-        ? currentGoals.filter(g => g !== goalKey)
-        : [...currentGoals, goalKey];
-      return { ...prev, journeySettings: { ...prev.journeySettings, goals: newGoals } };
-    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,18 +77,17 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
     }
   };
 
-  const currentTheme = COLORS[profile.accent] || COLORS.pink;
+  const currentTheme = COLORS[profile.accent] || COLORS.PINK;
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-10 animate-in pb-20 relative">
-      {/* Cylindrical Transition Overlay */}
+    <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 animate-in pb-20 relative px-1 md:px-0">
       <div 
         className={`theme-transition-overlay ${isTransitioning ? 'theme-transition-active' : ''}`}
         style={{ color: currentTheme.primary }}
       />
 
-      {/* Dynamic Navigation - More Visible Navigation */}
-      <div className="w-full md:w-80 space-y-3">
+      {/* Settings Navigation Sidebar */}
+      <div className="w-full md:w-72 space-y-3">
         <TabBtn icon={<User size={20} />} label={t.settings.tabs.profile} active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} theme={currentTheme} />
         <TabBtn icon={<Target size={20} />} label={t.settings.tabs.journey} active={activeTab === 'journey'} onClick={() => setActiveTab('journey')} theme={currentTheme} />
         <TabBtn icon={<Palette size={20} />} label={t.settings.tabs.custom} active={activeTab === 'custom'} onClick={() => setActiveTab('custom')} theme={currentTheme} />
@@ -81,44 +95,37 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
         <TabBtn icon={<Lock size={20} />} label={t.settings.tabs.privacy} active={activeTab === 'privacy'} onClick={() => setActiveTab('privacy')} theme={currentTheme} />
       </div>
 
-      {/* Main Content Area - Better Contrast & Shadow */}
-      <div className="flex-1 bg-white rounded-[4rem] p-10 md:p-16 shadow-2xl border-2 border-slate-50 space-y-12 transition-all duration-700">
+      {/* Main Settings Panel */}
+      <div className="flex-1 bg-white rounded-[2rem] p-8 md:p-14 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-50 space-y-12 transition-all duration-700">
         
+        {/* Tab 1: Personal Profile */}
         {activeTab === 'profile' && (
           <div className="space-y-12 animate-in fade-in">
-            <h3 className="text-4xl font-black text-gray-900 flex items-center gap-5">
-              <div className="p-4 bg-slate-50 rounded-[1.5rem] shadow-sm" style={{ color: currentTheme.primary }}><User size={32} /></div>
+            <h3 className="text-3xl font-black text-slate-800 flex items-center gap-5">
+              <div className="p-3.5 bg-slate-50 rounded-2xl shadow-inner" style={{ color: currentTheme.primary }}><User size={28} /></div>
               {t.settings.aboutYou}
             </h3>
 
-            {/* Profile Picture Section */}
-            <div className="flex flex-col sm:flex-row items-center gap-10 p-10 bg-slate-50/50 rounded-[3rem] border-2 border-slate-100 shadow-inner">
+            <div className="flex flex-col sm:flex-row items-center gap-10 p-10 bg-gradient-to-br from-slate-50 to-white rounded-[2rem] border border-slate-100 shadow-inner">
               <div className="relative group shrink-0">
-                <div className="h-36 w-36 rounded-[3rem] bg-white shadow-2xl overflow-hidden flex items-center justify-center border-4 border-white transition-transform group-hover:scale-105">
+                <div className="h-36 w-36 rounded-[2.5rem] bg-white shadow-2xl overflow-hidden flex items-center justify-center border-4 border-white transition-transform group-hover:scale-105 group-hover:rotate-2">
                   {profile.profilePicture ? (
                     <img src={profile.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <User size={64} className="text-slate-200" />
+                    <User size={64} className="text-slate-100" />
                   )}
                 </div>
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 p-4 bg-white shadow-2xl rounded-2xl text-slate-500 hover:text-pink-500 transition-all border-2 border-slate-50"
-                  title="Change Photo"
+                  className="absolute -bottom-2 -right-2 p-4 bg-white shadow-2xl rounded-2xl text-slate-500 hover:text-pink-500 transition-all border border-slate-50 hover:scale-110 active:scale-90"
                 >
                   <Camera size={24} />
                 </button>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange} 
-                  accept="image/*" 
-                  className="hidden" 
-                />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
               </div>
               <div className="space-y-3 text-center sm:text-left">
-                <h4 className="text-2xl font-black text-slate-800">{t.settings.identity}</h4>
-                <p className="text-base text-slate-500 font-medium leading-relaxed max-w-sm italic">"{t.settings.identitySub}"</p>
+                <h4 className="text-2xl font-black text-slate-800 tracking-tight">{t.settings.identity}</h4>
+                <p className="text-sm text-slate-500 font-medium italic leading-relaxed max-w-sm opacity-80">"{t.settings.identitySub}"</p>
                 <button 
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] mt-3 hover:opacity-70 transition-opacity"
@@ -135,8 +142,8 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
               <div className="space-y-4">
                 <label className="text-[11px] font-black uppercase text-slate-400 tracking-[0.2em] ml-2">{t.settings.fields.delivery}</label>
                 <select 
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] p-6 font-black text-slate-700 focus:ring-4 transition-all shadow-sm"
-                  style={{ '--tw-ring-color': currentTheme.primary } as any}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 font-black text-slate-700 focus:outline-none focus:ring-4 transition-all shadow-inner text-sm"
+                  style={{ '--tw-ring-color': currentTheme.primary + '33' } as any}
                   value={profile.deliveryType}
                   onChange={e => updateProfile({ deliveryType: e.target.value as any })}
                 >
@@ -149,268 +156,171 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
           </div>
         )}
 
+        {/* Tab 2: Journey Tuning */}
         {activeTab === 'journey' && (
           <div className="space-y-12 animate-in fade-in">
-            <div className="space-y-3">
-              <h3 className="text-4xl font-black text-gray-900 flex items-center gap-5">
-                <div className="p-4 bg-slate-50 rounded-[1.5rem]" style={{ color: currentTheme.primary }}><Target size={32} /></div>
-                {t.settings.journey.title}
-              </h3>
-              <p className="text-base text-slate-500 font-medium italic leading-relaxed max-w-2xl">{t.settings.journey.subtitle}</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Refined Pace Control */}
+             <h3 className="text-3xl font-black text-slate-800 flex items-center gap-5">
+              <div className="p-3.5 bg-slate-50 rounded-2xl shadow-inner" style={{ color: currentTheme.primary }}><Target size={28} /></div>
+              {t.settings.journey.title}
+            </h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-3">
-                    <Activity size={18} /> {t.settings.journey.paceTitle}
-                  </label>
-                  <p className="text-[11px] text-slate-500 font-black italic">{t.settings.journey.paceSub}</p>
-                </div>
-                <div className="flex bg-slate-100 p-2 rounded-[2.5rem] border-2 border-slate-200 shadow-inner">
+                <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">{t.settings.journey.paceTitle}</label>
+                <div className="flex bg-slate-50 p-2 rounded-2xl border border-slate-100 shadow-inner">
                    <button 
                     onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, pace: 'gentle' } })}
-                    className={`flex-1 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all ${profile.journeySettings.pace === 'gentle' ? 'bg-white shadow-xl scale-[1.02]' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${profile.journeySettings.pace === 'gentle' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}
                     style={{ color: profile.journeySettings.pace === 'gentle' ? currentTheme.primary : '' }}
                    >Gentle</button>
                    <button 
                     onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, pace: 'moderate' } })}
-                    className={`flex-1 py-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all ${profile.journeySettings.pace === 'moderate' ? 'bg-white shadow-xl scale-[1.02]' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${profile.journeySettings.pace === 'moderate' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400'}`}
                     style={{ color: profile.journeySettings.pace === 'moderate' ? currentTheme.primary : '' }}
                    >Moderate</button>
                 </div>
+                <p className="text-[11px] text-slate-400 font-bold italic px-2">{t.settings.journey.paceSub}</p>
               </div>
 
-              {/* Refined Commitment Control */}
               <div className="space-y-6">
-                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-3">
-                    <Clock size={18} /> {t.settings.journey.commitmentTitle}
-                  </label>
-                  <p className="text-[11px] text-slate-500 font-black italic">{t.settings.journey.commitmentSub}</p>
-                </div>
-                <div className="flex flex-col items-center gap-6 bg-slate-50 p-8 rounded-[3rem] border-2 border-slate-100 shadow-inner">
-                   <div className="w-full flex justify-between items-center mb-[-10px]">
-                      <span className="text-[10px] font-black text-slate-300">5m</span>
-                      <span className="text-[10px] font-black text-slate-300">30m</span>
-                      <span className="text-[10px] font-black text-slate-300">60m</span>
-                   </div>
+                <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">{t.settings.journey.commitmentTitle}</label>
+                <div className="flex flex-col gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-inner">
                    <input 
                     type="range" 
-                    min="5" 
-                    max="60" 
-                    step="5"
-                    className="w-full accent-pink-500 h-3 bg-slate-200 rounded-full appearance-none cursor-pointer"
+                    min="5" max="60" step="5"
+                    value={localCommitment}
+                    onChange={(e) => setLocalCommitment(parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer"
                     style={{ accentColor: currentTheme.primary }}
                    />
-                   <div className="flex items-center gap-3">
-                      <span className="font-black text-4xl tracking-tighter" style={{ color: currentTheme.text }}>15</span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Minutes Daily</span>
+                   <div className="flex justify-between items-center px-1">
+                      <span className="text-2xl font-black text-slate-800 tabular-nums">{localCommitment}</span>
+                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Minutes Daily</span>
                    </div>
                 </div>
               </div>
-            </div>
-
-            {/* Focus Areas Checklist - Practical implementation */}
-            <div className="space-y-8 pt-6">
-               <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-slate-400 tracking-[0.2em] flex items-center gap-3">
-                    <Focus size={18} /> {t.settings.journey.focusTitle}
-                  </label>
-                  <p className="text-[11px] text-slate-500 font-black italic">{t.settings.journey.focusSub}</p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <CheckItem 
-                    icon={<Activity size={20} />} 
-                    label={t.settings.journey.goals.pelvic} 
-                    active={profile.journeySettings.goals?.includes('pelvic')} 
-                    onChange={() => toggleGoal('pelvic')} 
-                    theme={currentTheme}
-                  />
-                  <CheckItem 
-                    icon={<Target size={20} />} 
-                    label={t.settings.journey.goals.core} 
-                    active={profile.journeySettings.goals?.includes('core')} 
-                    onChange={() => toggleGoal('core')} 
-                    theme={currentTheme}
-                  />
-                  <CheckItem 
-                    icon={<Activity size={20} />} 
-                    label={t.settings.journey.goals.mobility} 
-                    active={profile.journeySettings.goals?.includes('mobility')} 
-                    onChange={() => toggleGoal('mobility')} 
-                    theme={currentTheme}
-                  />
-                  <CheckItem 
-                    icon={<Zap size={20} />} 
-                    label={t.settings.journey.goals.energy} 
-                    active={profile.journeySettings.goals?.includes('energy')} 
-                    onChange={() => toggleGoal('energy')} 
-                    theme={currentTheme}
-                  />
-                </div>
             </div>
           </div>
         )}
 
+        {/* Tab 3: UI Customization */}
         {activeTab === 'custom' && (
           <div className="space-y-12 animate-in fade-in">
-            <h3 className="text-4xl font-black text-gray-900 flex items-center gap-5">
-              <div className="p-4 bg-slate-50 rounded-[1.5rem]" style={{ color: currentTheme.primary }}><Palette size={32} /></div>
+             <h3 className="text-3xl font-black text-slate-800 flex items-center gap-5">
+              <div className="p-3.5 bg-slate-50 rounded-2xl shadow-inner" style={{ color: currentTheme.primary }}><Palette size={28} /></div>
               {t.settings.lookFeel}
             </h3>
+
             <div className="space-y-8">
-              <label className="text-xs font-black uppercase text-slate-400 tracking-[0.2em] ml-2">{t.settings.accent}</label>
+              <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">{t.settings.accent}</label>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
                 {(Object.keys(COLORS) as ThemeAccent[]).map(key => (
                   <button 
                     key={key}
                     onClick={() => changeAccent(key)}
                     disabled={isTransitioning}
-                    className={`p-6 rounded-[3rem] border-4 flex flex-col items-center gap-4 transition-all ${profile.accent === key ? 'shadow-2xl scale-110' : 'bg-slate-50 hover:bg-slate-100 opacity-60'}`}
-                    style={{ 
-                      borderColor: profile.accent === key ? COLORS[key].primary : 'transparent', 
-                      backgroundColor: profile.accent === key ? 'white' : '' 
-                    }}
+                    className={`p-5 rounded-2xl border transition-all flex flex-col items-center gap-3 relative overflow-hidden group ${profile.accent === key ? 'bg-white shadow-xl border-slate-200' : 'bg-slate-50 border-transparent opacity-60'}`}
                   >
-                    <div className="w-14 h-14 rounded-[1.5rem] shadow-xl border-4 border-white" style={{ backgroundColor: COLORS[key].primary }} />
-                    <span className="font-black text-[10px] uppercase tracking-widest">{key}</span>
+                    <div className="w-12 h-12 rounded-xl shadow-lg border-2 border-white transition-transform group-hover:scale-110" style={{ backgroundColor: COLORS[key].primary }} />
+                    <span className="font-black text-[10px] uppercase tracking-tighter" style={{ color: profile.accent === key ? COLORS[key].text : '' }}>{key}</span>
+                    {profile.accent === key && (
+                      <div className="absolute top-1 right-1">
+                        <Check size={12} className="text-emerald-500" />
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="space-y-8 pt-4">
-              <label className="text-xs font-black uppercase text-slate-400 tracking-[0.2em] ml-2">{t.settings.language}</label>
-              <div className="flex flex-wrap gap-6">
-                 {['english', 'hindi'].map(langOption => (
+
+            <div className="space-y-8 pt-6">
+              <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">{t.settings.language}</label>
+              <div className="flex flex-wrap gap-4">
+                 {[
+                   { id: 'english', label: 'English (Global)' },
+                   { id: 'hindi', label: 'Hindi (India)' }
+                 ].map(langOption => (
                    <button 
-                    key={langOption}
-                    onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, language: langOption as Language } })}
-                    className={`px-12 py-6 rounded-[2rem] font-black text-base border-4 transition-all shadow-md ${profile.journeySettings.language === langOption ? 'text-white border-white scale-105' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'}`}
-                    style={{ backgroundColor: profile.journeySettings.language === langOption ? currentTheme.primary : '' }}
-                   >{langOption === 'english' ? 'English (Global)' : 'हिन्दी (भारत)'}</button>
+                    key={langOption.id}
+                    onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, language: langOption.id as Language } })}
+                    className={`px-10 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-md active:scale-95 ${profile.journeySettings.language === langOption.id ? 'text-white translate-y-[-2px]' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                    style={{ 
+                      backgroundColor: profile.journeySettings.language === langOption.id ? currentTheme.primary : '',
+                      boxShadow: profile.journeySettings.language === langOption.id ? `0 10px 20px ${currentTheme.primary}44` : ''
+                    }}
+                   >
+                     {langOption.label}
+                   </button>
                  ))}
               </div>
             </div>
           </div>
         )}
 
+        {/* Tab 4: Notifications */}
         {activeTab === 'notifications' && (
           <div className="space-y-12 animate-in fade-in">
-            <h3 className="text-4xl font-black text-gray-900 flex items-center gap-5">
-              <div className="p-4 bg-slate-50 rounded-[1.5rem]" style={{ color: currentTheme.primary }}><Bell size={32} /></div>
+            <h3 className="text-3xl font-black text-slate-800 flex items-center gap-5">
+              <div className="p-3.5 bg-slate-50 rounded-2xl shadow-inner" style={{ color: currentTheme.primary }}><Bell size={28} /></div>
               {t.settings.notifications.title}
             </h3>
-            <p className="text-base text-slate-500 font-medium italic -mt-8 leading-relaxed max-w-xl">"{t.settings.notifications.subtitle}"</p>
+            <p className="text-sm text-slate-500 font-medium italic -mt-6">{t.settings.notifications.subtitle}</p>
             
-            <div className="space-y-6">
-               <ToggleRow 
-                label={t.settings.notifications.exercise} 
-                active={profile.notifications.exerciseReminders} 
-                onChange={v => updateProfile({ notifications: {...profile.notifications, exerciseReminders: v} })} 
-                theme={currentTheme}
-               />
-               <ToggleRow 
-                label={t.settings.notifications.hydration} 
-                active={profile.notifications.hydrationAlerts} 
-                onChange={v => updateProfile({ notifications: {...profile.notifications, hydrationAlerts: v} })} 
-                theme={currentTheme}
-               />
-               <ToggleRow 
-                label={t.settings.notifications.mood} 
-                active={profile.notifications.moodCheckins} 
-                onChange={v => updateProfile({ notifications: {...profile.notifications, moodCheckins: v} })} 
-                theme={currentTheme}
-               />
-               <ToggleRow 
-                label={t.settings.notifications.care} 
-                active={profile.notifications.careConnectUpdates} 
-                onChange={v => updateProfile({ notifications: {...profile.notifications, careConnectUpdates: v} })} 
-                theme={currentTheme}
-               />
-               <ToggleRow 
-                label={t.settings.notifications.sos} 
-                active={profile.notifications.sosConfirmations} 
-                onChange={v => updateProfile({ notifications: {...profile.notifications, sosConfirmations: v} })} 
-                theme={currentTheme}
-               />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <CheckItem icon={<Activity size={24} />} label={t.settings.notifications.exercise} active={profile.notifications.exerciseReminders} onChange={v => updateNotifications('exerciseReminders', v)} theme={currentTheme} />
+              <CheckItem icon={<Zap size={24} />} label={t.settings.notifications.hydration} active={profile.notifications.hydrationAlerts} onChange={v => updateNotifications('hydrationAlerts', v)} theme={currentTheme} />
+              <CheckItem icon={<Heart size={24} />} label={t.settings.notifications.mood} active={profile.notifications.moodCheckins} onChange={v => updateNotifications('moodCheckins', v)} theme={currentTheme} />
+              <CheckItem icon={<Users size={24} />} label={t.settings.notifications.care} active={profile.notifications.careConnectUpdates} onChange={v => updateNotifications('careConnectUpdates', v)} theme={currentTheme} />
             </div>
           </div>
         )}
 
+        {/* Tab 5: Privacy & Caregiver */}
         {activeTab === 'privacy' && (
           <div className="space-y-12 animate-in fade-in">
-            <div className="space-y-3">
-              <h3 className="text-4xl font-black text-gray-900 flex items-center gap-5">
-                <div className="p-4 bg-slate-50 rounded-[1.5rem]" style={{ color: currentTheme.primary }}><Lock size={32} /></div>
-                {t.settings.privacy.title}
-              </h3>
-              <p className="text-base text-slate-500 font-medium italic leading-relaxed max-w-xl">"{t.settings.privacy.subtitle}"</p>
-            </div>
+            <h3 className="text-3xl font-black text-slate-800 flex items-center gap-5">
+              <div className="p-3.5 bg-slate-50 rounded-2xl shadow-inner" style={{ color: currentTheme.primary }}><Lock size={28} /></div>
+              {t.settings.privacy.title}
+            </h3>
+            
+            <div className="bg-gradient-to-br from-slate-50 to-white p-10 rounded-[2rem] border border-slate-100 space-y-10 shadow-inner">
+               <div className="space-y-6">
+                  <h4 className="text-xl font-black text-slate-800 flex items-center gap-3"><Users size={24} /> {t.settings.privacy.caregiverTitle}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Field label={t.settings.privacy.name} value={profile.caregiver.name} onChange={v => updateCaregiver({ name: v })} />
+                    <Field label={t.settings.privacy.relation} value={profile.caregiver.relationship} onChange={v => updateCaregiver({ relationship: v })} />
+                    <Field label={t.settings.privacy.phone} value={profile.caregiver.contact} onChange={v => updateCaregiver({ contact: v })} />
+                  </div>
+               </div>
 
-            <div className="bg-slate-50 p-10 rounded-[3.5rem] border-2 border-slate-100 shadow-inner space-y-10">
-               <div className="space-y-2">
-                 <h4 className="text-2xl font-black text-slate-800">{t.settings.privacy.caregiverTitle}</h4>
-                 <p className="text-sm text-slate-500 font-black italic">{t.settings.privacy.caregiverSub}</p>
-               </div>
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                 <Field label={t.settings.privacy.name} value={profile.caregiver.name} onChange={v => updateProfile({ caregiver: {...profile.caregiver, name: v} })} />
-                 <Field label={t.settings.privacy.relation} value={profile.caregiver.relationship} onChange={v => updateProfile({ caregiver: {...profile.caregiver, relationship: v} })} />
-                 <Field label={t.settings.privacy.phone} value={profile.caregiver.contact} onChange={v => updateProfile({ caregiver: {...profile.caregiver, contact: v} })} />
-               </div>
-            </div>
-
-            <div className="space-y-8">
-               <div className="space-y-2">
-                 <h4 className="text-2xl font-black text-slate-800 flex items-center gap-4">
-                   {t.settings.privacy.sharingTitle}
-                   <Shield className="text-emerald-500" size={28} />
-                 </h4>
-                 <p className="text-sm text-slate-500 font-black italic">{t.settings.privacy.sharingSub}</p>
-               </div>
-               
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 <CheckItem 
-                  icon={<Heart size={20} />} 
-                  label={t.settings.privacy.canMood} 
-                  active={profile.caregiver.permissions.canViewMood} 
-                  onChange={v => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewMood: v}} })} 
-                  theme={currentTheme}
-                 />
-                 <CheckItem 
-                  icon={<Activity size={20} />} 
-                  label={t.settings.privacy.canPhys} 
-                  active={profile.caregiver.permissions.canViewPhysical} 
-                  onChange={v => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewPhysical: v}} })} 
-                  theme={currentTheme}
-                 />
-                 <CheckItem 
-                  icon={<Clipboard size={20} />} 
-                  label={t.settings.privacy.canMed} 
-                  active={profile.caregiver.permissions.canViewMedicalHistory} 
-                  onChange={v => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewMedicalHistory: v}} })} 
-                  theme={currentTheme}
-                 />
-                 <CheckItem 
-                  icon={<Calendar size={20} />} 
-                  label={t.settings.privacy.canAppt} 
-                  active={profile.caregiver.permissions.canViewAppointments} 
-                  onChange={v => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewAppointments: v}} })} 
-                  theme={currentTheme}
-                 />
+               <div className="space-y-6 pt-6 border-t border-slate-200">
+                  <h4 className="text-lg font-black text-slate-800 uppercase tracking-widest text-[10px]">{t.settings.privacy.sharingTitle}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <PermissionToggle label={t.settings.privacy.canMood} active={profile.caregiver.permissions.canViewMood} onChange={v => updateCaregiverPermissions('canViewMood', v)} theme={currentTheme} />
+                    <PermissionToggle label={t.settings.privacy.canPhys} active={profile.caregiver.permissions.canViewPhysical} onChange={v => updateCaregiverPermissions('canViewPhysical', v)} theme={currentTheme} />
+                    <PermissionToggle label={t.settings.privacy.canMed} active={profile.caregiver.permissions.canViewMedicalHistory} onChange={v => updateCaregiverPermissions('canViewMedicalHistory', v)} theme={currentTheme} />
+                    <PermissionToggle label={t.settings.privacy.canAppt} active={profile.caregiver.permissions.canViewAppointments} onChange={v => updateCaregiverPermissions('canViewAppointments', v)} theme={currentTheme} />
+                  </div>
                </div>
             </div>
           </div>
         )}
-        
-        <div className="pt-12 border-t-2 border-slate-100 flex justify-end">
+
+        {/* Footer Actions */}
+        <div className="pt-10 border-t border-slate-50 flex justify-end">
            <button 
-            className="px-14 py-6 text-white rounded-full font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4 group"
-            style={{ backgroundColor: currentTheme.primary, boxShadow: `0 30px 60px -15px ${currentTheme.primary}77` }}
-            onClick={() => alert(t.common.apply)}
+            className="px-14 py-5 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4"
+            style={{ 
+              backgroundColor: currentTheme.primary, 
+              boxShadow: `0 20px 40px -10px ${currentTheme.primary}66`,
+              background: `linear-gradient(135deg, ${currentTheme.primary}, ${currentTheme.text})`
+            }}
+            onClick={() => {
+              updateProfile({ streakCount: profile.streakCount }); // Simple persist trigger simulation
+              alert(t.common.apply);
+            }}
            >
-             <Save size={24} className="group-hover:rotate-12 transition-transform" /> {t.settings.apply}
+             <Save size={20} /> {t.settings.apply}
            </button>
         </div>
       </div>
@@ -421,58 +331,60 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
 const TabBtn = ({ icon, label, active, onClick, theme }: any) => (
   <button 
     onClick={onClick}
-    className={`w-full flex items-center gap-5 px-10 py-6 rounded-[2.5rem] font-black text-base transition-all border-2 group ${
-      active ? 'bg-white shadow-2xl scale-105 border-slate-50' : 'text-slate-400 hover:bg-white/60 border-transparent hover:border-slate-50'
+    className={`w-full flex items-center gap-4 px-6 py-4 rounded-xl font-black text-sm transition-all border group relative overflow-hidden ${
+      active ? 'bg-white shadow-[0_10px_30px_rgba(0,0,0,0.05)] border-slate-100 scale-[1.03]' : 'text-slate-400 hover:bg-white/60 border-transparent hover:translate-x-1'
     }`}
     style={{ color: active ? theme.text : '' }}
   >
-    <div className={`p-2 rounded-xl transition-all ${active ? 'bg-slate-50 text-slate-800' : 'text-slate-300'}`} style={{ color: active ? theme.primary : '' }}>
+    <div className={`p-2 rounded-lg transition-all ${active ? 'bg-slate-50 text-slate-800' : 'text-slate-200'}`} style={{ color: active ? theme.primary : '' }}>
        {icon}
     </div>
-    <span className="tracking-tight">{label}</span>
+    <span className="tracking-tight relative z-10">{label}</span>
+    {active && (
+      <div className="absolute left-0 top-0 w-1 h-full" style={{ backgroundColor: theme.primary }} />
+    )}
   </button>
 );
 
 const Field = ({ label, value, onChange, type = "text" }: any) => (
-  <div className="space-y-4">
-    <label className="text-[11px] font-black uppercase text-slate-400 tracking-[0.2em] ml-2">{label}</label>
+  <div className="space-y-3">
+    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">{label}</label>
     <input 
       type={type} 
       value={value} 
       onChange={e => onChange(e.target.value)}
-      className="w-full bg-slate-50 border-2 border-slate-100 rounded-[1.5rem] p-6 font-black text-slate-700 focus:ring-4 transition-all shadow-sm focus:bg-white"
+      className="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 font-black text-slate-700 focus:outline-none focus:ring-4 transition-all shadow-inner text-sm focus:bg-white focus:shadow-md"
+      style={{ '--tw-ring-color': '#00000008' } as any}
     />
-  </div>
-);
-
-const ToggleRow = ({ label, active, onChange, theme }: any) => (
-  <div className="flex items-center justify-between p-8 rounded-[2rem] bg-slate-50/50 hover:bg-white hover:shadow-xl border-2 border-transparent hover:border-slate-100 transition-all cursor-pointer group">
-    <span className="font-black text-slate-800 text-lg group-hover:translate-x-1 transition-transform">{label}</span>
-    <button 
-      onClick={() => onChange(!active)}
-      className={`w-16 h-10 rounded-full relative transition-all duration-300 shadow-inner ${active ? '' : 'bg-slate-300'}`}
-      style={{ backgroundColor: active ? theme.primary : '' }}
-    >
-      <div className={`absolute top-1.5 w-7 h-7 bg-white rounded-full shadow-2xl transition-all duration-300 ${active ? 'left-8' : 'left-1.5'}`} />
-    </button>
   </div>
 );
 
 const CheckItem = ({ icon, label, active, onChange, theme }: any) => (
   <button 
     onClick={() => onChange(!active)}
-    className={`flex items-center gap-6 p-8 rounded-[2.5rem] text-left border-4 transition-all group ${
-      active ? 'bg-white shadow-2xl scale-[1.03] z-10' : 'bg-slate-50/50 border-transparent text-slate-400 opacity-60 hover:opacity-100 hover:bg-white'
+    className={`flex items-center gap-5 p-6 rounded-2xl text-left border transition-all group relative overflow-hidden ${
+      active ? 'bg-white shadow-xl border-slate-100 scale-[1.02]' : 'bg-slate-50/50 border-transparent text-slate-400 opacity-80 hover:opacity-100 hover:bg-white'
     }`}
-    style={{ borderColor: active ? theme.primary : 'transparent' }}
   >
     <div 
-      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-md ${active ? 'text-white' : 'bg-white text-slate-300'}`}
-      style={{ backgroundColor: active ? theme.primary : '' }}
+      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm ${active ? 'text-white' : 'bg-white text-slate-200'}`}
+      style={{ backgroundColor: active ? theme.primary : '', background: active ? `linear-gradient(135deg, ${theme.primary}, ${theme.text})` : '' }}
     >
       {active ? <Check size={28} strokeWidth={4} /> : icon}
     </div>
-    <span className={`font-black text-lg leading-tight ${active ? 'text-gray-900' : ''}`}>{label}</span>
+    <span className={`font-black text-base leading-tight ${active ? 'text-slate-800' : ''}`}>{label}</span>
+  </button>
+);
+
+const PermissionToggle = ({ label, active, onChange, theme }: any) => (
+  <button 
+    onClick={() => onChange(!active)}
+    className={`flex items-center justify-between gap-4 p-4 rounded-xl bg-white border transition-all ${active ? 'border-slate-200 shadow-sm' : 'border-slate-100 opacity-60'}`}
+  >
+    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{label}</span>
+    <div className={`w-11 h-6 rounded-full relative transition-all shadow-inner ${active ? 'bg-emerald-400' : 'bg-slate-200'}`} style={{ backgroundColor: active ? theme.primary : '' }}>
+       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${active ? 'left-6' : 'left-1'}`} />
+    </div>
   </button>
 );
 

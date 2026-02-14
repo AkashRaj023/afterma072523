@@ -1,7 +1,7 @@
 
 export type DeliveryType = 'normal' | 'c-section';
-export type ThemeAccent = 'pink' | 'green' | 'blue' | 'grey' | 'yellow';
-export type RecoveryPhase = 'Stabilize' | 'Strengthen' | 'Restore' | 'Rebuild Confidence';
+export type ThemeAccent = 'PINK' | 'GREEN' | 'BLUE' | 'PURPLE' | 'YELLOW';
+export type RecoveryPhase = 'Month 1' | 'Month 2' | 'Month 3' | 'Month 4+';
 export type RecoveryPace = 'gentle' | 'moderate';
 export type Language = 'english' | 'hindi';
 
@@ -36,10 +36,11 @@ export interface CaregiverInfo {
 export interface Appointment {
   id: string;
   specialistName: string;
-  type: 'OBGYN' | 'Physio' | 'Lactation' | 'MentalHealth';
+  type: string;
   date: string;
   time: string;
-  status: 'Upcoming' | 'Completed' | 'Cancelled';
+  status: 'Upcoming' | 'Completed' | 'Cancelled' | 'Rescheduled';
+  price?: string;
 }
 
 export interface CommunityCircle {
@@ -65,6 +66,15 @@ export interface CartItem extends StoreItem {
   quantity: number;
 }
 
+export interface PeriodLog {
+  id: string;
+  date: string;
+  flow: 'Spotting' | 'Light' | 'Medium' | 'Heavy';
+  symptoms: string[];
+  mood: string;
+  notes: string;
+}
+
 export interface UserProfile {
   name: string;
   age: number;
@@ -86,6 +96,7 @@ export interface UserProfile {
   caregiver: CaregiverInfo;
   journeySettings: JourneySettings;
   notifications: NotificationSettings;
+  periodLogs: PeriodLog[];
   profilePicture?: string;
 }
 
@@ -108,8 +119,9 @@ export interface RecoveryActivity {
   phase: RecoveryPhase;
   title: string;
   description: string;
-  category: 'breathing' | 'pelvic' | 'walking' | 'physio' | 'checkpoint' | 'stretching';
+  category: 'Physical Recovery' | 'Emotional Stabilization' | 'Strength Building';
   duration: number; // minutes
+  frequency: string; // e.g., "3x week"
   points: number;
   typeSpecific?: DeliveryType; 
   intensityScale: number; // 1-10

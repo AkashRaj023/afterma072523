@@ -2,43 +2,43 @@
 import { RecoveryActivity, RecoveryPhase, StoreItem } from './types';
 
 export const COLORS = {
-  pink: { 
-    primary: '#EC4899', // Vibrant Hot Pink
+  PINK: { 
+    primary: '#EC4899', 
     bg: '#FFF5F7', 
     border: '#F9A8D4', 
-    text: '#831843', // Deep Pink for contrast
+    text: '#831843', 
     ring: 'ring-pink-200',
     light: '#FFF5F7'
   },
-  green: { 
-    primary: '#10B981', // Vivid Emerald
+  GREEN: { 
+    primary: '#10B981', 
     bg: '#F0FDF4', 
     border: '#A7F3D0', 
-    text: '#064E3B', // Deep Green for contrast
+    text: '#064E3B', 
     ring: 'ring-emerald-200',
     light: '#F0FDF4'
   },
-  blue: { 
-    primary: '#0EA5E9', // Sky Blue
+  BLUE: { 
+    primary: '#0EA5E9', 
     bg: '#F0F9FF', 
     border: '#BAE6FD', 
-    text: '#0C4A6E', // Deep Blue for contrast
+    text: '#0C4A6E', 
     ring: 'ring-sky-200',
     light: '#F0F9FF'
   },
-  grey: { 
-    primary: '#6366F1', // Bright Indigo
-    bg: '#F8FAFC', 
-    border: '#E2E8F0', 
-    text: '#1E293B', // Deep Slate for contrast
-    ring: 'ring-indigo-200',
-    light: '#F8FAFC'
+  PURPLE: { 
+    primary: '#8B5CF6', 
+    bg: '#F5F3FF', 
+    border: '#DDD6FE', 
+    text: '#4C1D95', 
+    ring: 'ring-purple-200',
+    light: '#F5F3FF'
   },
-  yellow: { 
-    primary: '#F59E0B', // Sunny Amber
+  YELLOW: { 
+    primary: '#F59E0B', 
     bg: '#FFFBEB', 
     border: '#FDE68A', 
-    text: '#78350F', // Warm Brown for contrast
+    text: '#78350F', 
     ring: 'ring-amber-200',
     light: '#FFFBEB'
   }
@@ -56,25 +56,28 @@ export const HELPLINES = {
   emergency: "112"
 };
 
-export const PHASES: RecoveryPhase[] = ['Stabilize', 'Strengthen', 'Restore', 'Rebuild Confidence'];
+export const PHASES: RecoveryPhase[] = ['Month 1', 'Month 2', 'Month 3', 'Month 4+'];
 
 export const RECOVERY_DATABASE: RecoveryActivity[] = [
-  // Phase 1: Stabilize
-  { id: 'st-1', phase: 'Stabilize', category: 'breathing', title: 'Deep Diaphragmatic Breath', description: 'Gently expand your belly as you inhale. Essential for internal pressure management.', duration: 5, points: 10, intensityScale: 1 },
-  { id: 'st-2', phase: 'Stabilize', category: 'pelvic', title: 'Gentle Floor Awareness', description: 'Visualization and very light engagement of the pelvic floor.', duration: 3, points: 10, intensityScale: 1 },
-  { id: 'st-cs-1', phase: 'Stabilize', category: 'physio', title: 'Log Rolling Technique', description: 'Safe way to get out of bed without straining incision.', duration: 2, points: 15, typeSpecific: 'c-section', intensityScale: 2 },
+  // Month 1: Stabilization & Gentle Movement
+  { id: 'm1-p1', phase: 'Month 1', category: 'Physical Recovery', title: 'Deep Diaphragmatic Breath', description: 'Internal pressure management and core connection.', duration: 5, frequency: 'Daily', points: 10, intensityScale: 1 },
+  { id: 'm1-e1', phase: 'Month 1', category: 'Emotional Stabilization', title: 'Skin-to-Skin Bonding', description: '5 mins of eye contact or skin contact to lower cortisol.', duration: 5, frequency: 'Daily', points: 15, intensityScale: 1 },
+  { id: 'm1-s1', phase: 'Month 1', category: 'Strength Building', title: 'Pelvic Floor Awareness', description: 'Visualizing engagement without heavy contraction.', duration: 3, frequency: '3x week', points: 10, intensityScale: 2 },
+  { id: 'm1-cs1', phase: 'Month 1', category: 'Physical Recovery', title: 'Safe Mobility: Log Roll', description: 'Preventing abdominal strain after C-Section.', duration: 2, frequency: 'As needed', points: 15, typeSpecific: 'c-section', intensityScale: 2 },
   
-  // Phase 2: Strengthen
-  { id: 'sg-1', phase: 'Strengthen', category: 'pelvic', title: 'Timed Kegel Series', description: 'Structured holds and releases to build functional strength.', duration: 5, points: 20, intensityScale: 3 },
-  { id: 'sg-2', phase: 'Strengthen', category: 'physio', title: 'Transverse Abdominal Wake-up', description: 'Subtle deep core engagement without crunching.', duration: 4, points: 20, intensityScale: 4 },
-  
-  // Phase 3: Restore
-  { id: 'rt-1', phase: 'Restore', category: 'walking', title: 'Structured Interval Walk', description: '10 min walk with posture focus.', duration: 10, points: 30, intensityScale: 5 },
-  { id: 'rt-2', phase: 'Restore', category: 'stretching', title: 'Post-Nursing Neck Stretch', description: 'Relieve tension from nursing or holding the baby.', duration: 5, points: 15, intensityScale: 3 },
-  
-  // Phase 4: Rebuild Confidence
-  { id: 'rb-1', phase: 'Rebuild Confidence', category: 'physio', title: 'Functional Mobility Flow', description: 'Gentle full-body movement patterns.', duration: 15, points: 50, intensityScale: 7 },
-  { id: 'rb-cp', phase: 'Rebuild Confidence', category: 'checkpoint', title: 'Diastasis Recti Final Check', description: 'Assess core closure before advanced activity.', duration: 10, points: 100, intensityScale: 2 }
+  // Month 2: Gentle Strength
+  { id: 'm2-p1', phase: 'Month 2', category: 'Physical Recovery', title: 'Structured Walking', description: 'Short 10-min interval walks to build stamina.', duration: 10, frequency: 'Daily', points: 20, intensityScale: 3 },
+  { id: 'm2-e1', phase: 'Month 2', category: 'Emotional Stabilization', title: 'Gratitude Journaling', description: 'Note 3 wins to anchor your mental resilience.', duration: 5, frequency: 'Daily', points: 10, intensityScale: 1 },
+  { id: 'm2-s1', phase: 'Month 2', category: 'Strength Building', title: 'Transverse Core Wake-up', description: 'Subtle deep core activation exercises.', duration: 5, frequency: '4x week', points: 25, intensityScale: 4 },
+
+  // Month 3: Restoration
+  { id: 'm3-p1', phase: 'Month 3', category: 'Physical Recovery', title: 'Post-Nursing Neck Stretch', description: 'Relieving cervical tension from holding baby.', duration: 5, frequency: 'Daily', points: 15, intensityScale: 3 },
+  { id: 'm3-e1', phase: 'Month 3', category: 'Emotional Stabilization', title: 'Guided Grounding', description: '5-4-3-2-1 technique for anxious moments.', duration: 10, frequency: 'As needed', points: 20, intensityScale: 2 },
+  { id: 'm3-s1', phase: 'Month 3', category: 'Strength Building', title: 'Pelvic Power Series', description: 'Timed holds and rapid pulses for functional core.', duration: 8, frequency: '3x week', points: 30, intensityScale: 5 },
+
+  // Month 4+: Confidence & Resilience
+  { id: 'm4-p1', phase: 'Month 4+', category: 'Physical Recovery', title: 'Full Body Mobility Flow', description: 'Dynamic movement to regain full range of motion.', duration: 15, frequency: '3x week', points: 40, intensityScale: 6 },
+  { id: 'm4-s1', phase: 'Month 4+', category: 'Strength Building', title: 'Checkpoint: Diastasis Recti', description: 'Self-assessment and targeted closure drills.', duration: 12, frequency: '2x week', points: 100, intensityScale: 4 }
 ];
 
 export const STABILIZATION_TASKS = [
@@ -116,19 +119,17 @@ export const EPDS_QUESTIONS = [
 ];
 
 export const STORE_ITEMS: StoreItem[] = [
-  { id: 'p1', name: 'Organic Nipple Balm', brand: 'Lansinoh', category: 'Recovery', price: 450, image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=200', description: 'Soothes and protects sensitive skin.', rating: 4.8 },
-  { id: 'p2', name: 'Cotton Belly Wrap', brand: 'Mothercare', category: 'Recovery', price: 1200, image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=200', description: 'Comfortable support for postpartum core.', rating: 4.9 },
-  { id: 'p3', name: 'Cerelac Wheat-Apple', brand: 'Nestlé', category: 'Nutrition', price: 350, image: 'https://images.unsplash.com/photo-1544787210-2211d430154e?auto=format&fit=crop&q=80&w=200', description: 'Traditional infant nutrition supplement.', rating: 4.7 },
-  { id: 'p4', name: 'Symphony Breast Pump', brand: 'Medela', category: 'Devices', price: 4500, image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=200', description: 'Hospital-grade efficiency for home use.', rating: 4.6 },
-  { id: 'p5', name: 'Pure Almond Baby Oil', brand: 'Himalaya', category: 'Baby Care', price: 250, image: 'https://images.unsplash.com/photo-1555820585-c5ae44394b79?auto=format&fit=crop&q=80&w=200', description: 'Traditional Ayurvedic care for infants.', rating: 4.9 },
-  { id: 'p6', name: 'Diaper Rash Cream', brand: 'Sebamed', category: 'Baby Care', price: 550, image: 'https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&q=80&w=200', description: 'pH balanced clinical protection.', rating: 4.8 },
-  { id: 'p7', name: 'Stretch Mark Lotion', brand: 'Mamaearth', category: 'Recovery', price: 499, image: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&q=80&w=200', description: 'Toxin-free care for recovery skin.', rating: 4.7 },
-  { id: 'p8', name: 'Natural Baby Wipes', brand: 'Johnson & Johnson', category: 'Baby Care', price: 199, image: 'https://images.unsplash.com/photo-1584305650818-bc19bca9445a?auto=format&fit=crop&q=80&w=200', description: 'Clinically proven mildness for soft skin.', rating: 4.6 },
-  { id: 'p9', name: 'Avent Natural Bottle', brand: 'Philips Avent', category: 'Devices', price: 850, image: 'https://images.unsplash.com/photo-1610492317734-d89741c8c114?auto=format&fit=crop&q=80&w=200', description: 'Wide breast-shaped nipple for natural latch.', rating: 4.8 },
-  { id: 'p10', name: 'Postpartum Tea Mix', brand: 'Pigeon', category: 'Nutrition', price: 420, image: 'https://images.unsplash.com/photo-1594631252845-595b998e31b6?auto=format&fit=crop&q=80&w=200', description: 'Supports lactation and digestive ease.', rating: 4.5 },
-  { id: 'p11', name: 'Baby Bath Foam', brand: 'Chicco', category: 'Baby Care', price: 600, image: 'https://images.unsplash.com/photo-1559839734-2b71f1e3c770?auto=format&fit=crop&q=80&w=200', description: 'No-tears formula with calendula.', rating: 4.7 },
-  { id: 'p12', name: 'Bio-Oil Skincare Oil', brand: 'Bio-Oil', category: 'Recovery', price: 700, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=200', description: 'Specialist scar and stretch mark treatment.', rating: 4.9 },
-  { id: 'p13', name: 'Comfort Nursing Bra', brand: 'FirstCry', category: 'Recovery', price: 890, image: 'https://images.unsplash.com/photo-1582533089852-02c3cd51aa5a?auto=format&fit=crop&q=80&w=200', description: 'Seamless support for all-day wear.', rating: 4.8 },
+  { id: 'p1', name: 'Organic Nipple Balm', brand: 'Mamaearth', category: 'Recovery', price: 450, image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=400', description: 'Soothes and protects sensitive skin.', rating: 4.8 },
+  { id: 'p2', name: 'Cotton Belly Wrap', brand: 'FirstCry', category: 'Recovery', price: 1200, image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=400', description: 'Comfortable support for postpartum core.', rating: 4.9 },
+  { id: 'p3', name: 'Cerelac Wheat-Apple', brand: 'Nestlé', category: 'Nutrition', price: 350, image: 'https://images.unsplash.com/photo-1544787210-2211d430154e?auto=format&fit=crop&q=80&w=400', description: 'Traditional infant nutrition supplement.', rating: 4.7 },
+  { id: 'p4', name: 'Symphony Breast Pump', brand: 'Medela', category: 'Devices', price: 4500, image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=400', description: 'Hospital-grade efficiency for home use.', rating: 4.6 },
+  { id: 'p5', name: 'Pure Almond Baby Oil', brand: 'Himalaya Baby', category: 'Baby Care', price: 250, image: 'https://images.unsplash.com/photo-1555820585-c5ae44394b79?auto=format&fit=crop&q=80&w=400', description: 'Traditional Ayurvedic care for infants.', rating: 4.9 },
+  { id: 'p6', name: 'Diaper Rash Cream', brand: 'Sebamed', category: 'Baby Care', price: 550, image: 'https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&q=80&w=400', description: 'pH balanced clinical protection.', rating: 4.8 },
+  { id: 'p7', name: 'Stretch Mark Lotion', brand: 'Mamaearth', category: 'Recovery', price: 499, image: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&q=80&w=400', description: 'Toxin-free care for recovery skin.', rating: 4.7 },
+  { id: 'p8', name: 'Natural Baby Wipes', brand: 'Johnson & Johnson', category: 'Baby Care', price: 199, image: 'https://images.unsplash.com/photo-1584305650818-bc19bca9445a?auto=format&fit=crop&q=80&w=400', description: 'Clinically proven mildness for soft skin.', rating: 4.6 },
+  { id: 'p9', name: 'Avent Natural Bottle', brand: 'Philips Avent', category: 'Devices', price: 850, image: 'https://images.unsplash.com/photo-1610492317734-d89741c8c114?auto=format&fit=crop&q=80&w=400', description: 'Wide breast-shaped nipple for natural latch.', rating: 4.8 },
+  { id: 'p10', name: 'Postpartum Tea Mix', brand: 'Pigeon', category: 'Nutrition', price: 420, image: 'https://images.unsplash.com/photo-1594631252845-595b998e31b6?auto=format&fit=crop&q=80&w=400', description: 'Supports lactation and digestive ease.', rating: 4.5 },
+  { id: 'p11', name: 'Baby Bath Foam', brand: 'Chicco', category: 'Baby Care', price: 600, image: 'https://images.unsplash.com/photo-1559839734-2b71f1e3c770?auto=format&fit=crop&q=80&w=400', description: 'No-tears formula with calendula.', rating: 4.7 },
 ];
 
 export const EXPERT_DATA = [

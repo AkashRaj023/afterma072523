@@ -11,7 +11,8 @@ interface MembershipProps {
 
 const Membership: React.FC<MembershipProps> = ({ profile, setProfile }) => {
   const isPlus = profile.membershipPlan === 'plus';
-  const theme = COLORS[profile.accent] || COLORS.pink;
+  // Fix: Property 'pink' does not exist on type COLORS, changed to 'PINK'
+  const theme = COLORS[profile.accent] || COLORS.PINK;
 
   const handleUpgrade = () => {
     // Razorpay Integration Simulation

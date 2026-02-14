@@ -5,8 +5,8 @@ export const translations: any = {
       signIn: "Sign In",
       signOut: "Sign Out",
       sos: "Double tap for SOS",
-      incognito: "Incognito",
-      hidden: "Hidden",
+      incognito: "GHOST",
+      hidden: "GHOST",
       searchPlaceholder: "Safe Search...",
       welcome: "Pranam",
       saveChanges: "Save Changes",
@@ -58,7 +58,10 @@ export const translations: any = {
       timer: "Timer",
       activeTitle: "Active Focus",
       intensityLabel: "Intensity",
-      durationLabel: "Duration"
+      durationLabel: "Duration",
+      frequencyLabel: "Frequency",
+      cycleTitle: "Cycle Tracking",
+      reportTitle: "Health Summary"
     },
     mental: {
       title: "Emotional Heaven",
@@ -99,6 +102,11 @@ export const translations: any = {
         book: "Book Safe Session",
         session: "session",
         request: "Request"
+      },
+      community: {
+        sistersJoined: "Sisters Joined",
+        joinSisters: "Join Sisters Circle",
+        shareWithSisters: "Share with Sisters"
       }
     },
     momkart: {
@@ -111,7 +119,14 @@ export const translations: any = {
       basketTotal: "Basket Total",
       freeDelivery: "Free Express Care Delivery Included",
       confirm: "Confirm & Secure Checkout",
-      resting: "Your basket is resting..."
+      resting: "Your basket is resting...",
+      payment: {
+        title: "Secure Payment",
+        upi: "UPI (Google Pay, PhonePe)",
+        card: "Credit / Debit Card",
+        netbanking: "Net Banking",
+        express: "Express Delivery (+₹49)"
+      }
     },
     education: {
       title: "Recovery Learning Center",
@@ -135,7 +150,7 @@ export const translations: any = {
       title: "Settings",
       tabs: {
         profile: "Personal Profile",
-        journey: "Recovery Journey",
+        journey: "Journey Tuning",
         custom: "UI Customization",
         notifications: "Notifications",
         privacy: "Privacy & Caregiver"
@@ -155,7 +170,7 @@ export const translations: any = {
       language: "Interface Language",
       apply: "Apply Customizations",
       journey: {
-        title: "Tuning Your Recovery",
+        title: "Journey Tuning",
         subtitle: "Adjust your journey's pace and goals to match your energy levels and physical readiness.",
         paceTitle: "Recovery Pace",
         paceSub: "Gentle limits intensity to early-stage safe movements.",
@@ -202,8 +217,8 @@ export const translations: any = {
       signIn: "साइन इन करें",
       signOut: "साइन आउट",
       sos: "SOS के लिए दो बार टैप करें",
-      incognito: "गुप्त",
-      hidden: "छिपा हुआ",
+      incognito: "GHOST",
+      hidden: "GHOST",
       searchPlaceholder: "सुरक्षित खोज...",
       welcome: "प्रणाम",
       saveChanges: "बदलाव सहेजें",
@@ -255,7 +270,10 @@ export const translations: any = {
       timer: "टाइमर",
       activeTitle: "सक्रिय ध्यान",
       intensityLabel: "तीव्रता",
-      durationLabel: "अवधि"
+      durationLabel: "अवधि",
+      frequencyLabel: "आवृत्ति",
+      cycleTitle: "चक्र ट्रैकिंग",
+      reportTitle: "स्वास्थ्य सारांश"
     },
     mental: {
       title: "भावनात्मक स्वर्ग",
@@ -296,6 +314,11 @@ export const translations: any = {
         book: "सुरक्षित सत्र बुक करें",
         session: "सत्र",
         request: "अनुरोध"
+      },
+      community: {
+        sistersJoined: "बहनें जुड़ीं",
+        joinSisters: "सिस्टर्स सर्कल में शामिल हों",
+        shareWithSisters: "बहनों के साथ साझा करें"
       }
     },
     momkart: {
@@ -308,7 +331,14 @@ export const translations: any = {
       basketTotal: "कुल राशि",
       freeDelivery: "मुफ्त एक्सप्रेस केयर डिलीवरी शामिल है",
       confirm: "पुष्टि करें और सुरक्षित चेकआउट",
-      resting: "आपकी टोकरी खाली है..."
+      resting: "आपकी टोकरी खाली है...",
+      payment: {
+        title: "सुरक्षित भुगतान",
+        upi: "UPI (Google Pay, PhonePe)",
+        card: "क्रेडिट / डेबिट कार्ड",
+        netbanking: "नेट बैंकिंग",
+        express: "एक्सप्रेस डिलीवरी (+₹49)"
+      }
     },
     education: {
       title: "रिकवरी लर्निंग सेंटर",
@@ -332,7 +362,7 @@ export const translations: any = {
       title: "सेटिंग्स",
       tabs: {
         profile: "व्यक्तिगत प्रोफ़ाइल",
-        journey: "रिकवरी यात्रा",
+        journey: "जर्नी ट्यूनिंग",
         custom: "UI कस्टमाइजेशन",
         notifications: "सूचनाएं",
         privacy: "गोपनीयता और केयरगिवर"
@@ -352,7 +382,7 @@ export const translations: any = {
       language: "Interface Language",
       apply: "कस्टमाइजेशन लागू करें",
       journey: {
-        title: "रिकवरी की ट्यूनिंग",
+        title: "जर्नी ट्यूनिंग",
         subtitle: "अपनी ऊर्जा के स्तर और शारीरिक स्थिति के अनुसार अपनी यात्रा की गति और लक्ष्यों को समायोजित करें।",
         paceTitle: "रिकवरी की गति",
         paceSub: "कोमल गति तीव्रता को शुरुआती चरण के सुरक्षित व्यायामों तक सीमित रखती है।",
