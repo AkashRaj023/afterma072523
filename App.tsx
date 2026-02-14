@@ -11,14 +11,15 @@ import Settings from './components/Settings';
 import SOSOverlay from './components/SOSOverlay';
 import NotificationPanel from './components/NotificationPanel';
 import CareConnect from './components/CareConnect';
-import { Search, LogIn, EyeOff, Bell, Heart, Zap, User } from 'lucide-react';
-import { RECOVERY_DATABASE, PHASES, COLORS } from './constants';
+import { Search, Bell, Menu, X as CloseIcon } from 'lucide-react';
+import { RECOVERY_DATABASE, COLORS } from './constants';
 
 const App: React.FC = () => {
   const [currentView, setView] = useState<AppView>('education');
   const [showSOS, setShowSOS] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Care Connect States
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -76,7 +77,11 @@ const App: React.FC = () => {
     localStorage.setItem('afterma_profile_v2', JSON.stringify(profile));
   }, [profile]);
 
-  // Handle Dynamic Theme
+  // Close mobile menu on view change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [currentView]);
+
   const theme = COLORS[profile.accent] || COLORS.pink;
 
   const addNotification = (title: string, text: string) => {
@@ -124,53 +129,84 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex transition-colors duration-500 font-sans`} style={{ backgroundColor: theme.bg }}>
-      <Navigation currentView={currentView} setView={setView} profile={profile} logout={logout} />
+      {/* Mobile Navigation Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[55] lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Navigation - Sidebar on Desktop, Drawer on Mobile */}
+      <div className={`fixed inset-y-0 left-0 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 ease-in-out z-[60] lg:z-50`}>
+        <Navigation 
+          currentView={currentView} 
+          setView={setView} 
+          profile={profile} 
+          logout={logout}
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
+      </div>
       
-      <main className="flex-1 ml-64 min-h-screen relative overflow-x-hidden">
-        <header className="h-20 bg-white/90 backdrop-blur-md sticky top-0 z-40 px-8 flex items-center justify-between border-b border-pink-100/30">
-          <div className="flex items-center gap-6 flex-1">
-            <div className="relative max-w-lg w-full">
+      <main className="flex-1 w-full lg:ml-64 min-h-screen relative overflow-x-hidden">
+        <header className="h-16 lg:h-20 bg-white/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 flex items-center justify-between border-b border-pink-100/30">
+          <div className="flex items-center gap-4 lg:gap-6 flex-1">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 lg:hidden text-gray-500 hover:bg-gray-100 rounded-xl"
+            >
+              <Menu size={24} />
+            </button>
+            
+            <div className="relative max-w-lg w-full hidden sm:block">
               <Search className={`absolute left-4 top-1/2 -translate-y-1/2 ${profile.incognito ? 'text-purple-500' : 'text-gray-400'}`} size={18} />
               <input 
                 type="text" 
-                placeholder={profile.incognito ? "Incognito Search Active..." : "Find activities, experts, recipes..."}
-                className={`w-full border-none rounded-full py-3 pl-14 pr-24 focus:ring-2 transition-all text-sm ${profile.incognito ? 'bg-purple-50 focus:ring-purple-200' : 'bg-gray-50 focus:ring-pink-200'}`}
+                placeholder={profile.incognito ? "Incognito Active..." : "Find activities..."}
+                className={`w-full border-none rounded-full py-2.5 pl-12 pr-20 focus:ring-2 transition-all text-sm ${profile.incognito ? 'bg-purple-50 focus:ring-purple-200' : 'bg-gray-50 focus:ring-pink-200'}`}
               />
               <button 
                 onClick={() => setProfile(p => ({...p, incognito: !p.incognito}))}
-                className={`absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase px-2.5 py-1 rounded-full transition-all ${profile.incognito ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase px-2 py-1 rounded-full transition-all ${profile.incognito ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
               >
-                {profile.incognito ? 'Hide' : 'Incognito'}
+                {profile.incognito ? 'Hide' : 'Ghost'}
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 lg:gap-6">
             <button 
               onMouseDown={(e) => {
                 const timer = setTimeout(triggerSOS, 1500);
                 const clear = () => clearTimeout(timer);
                 e.currentTarget.addEventListener('mouseup', clear);
                 e.currentTarget.addEventListener('mouseleave', clear);
+                // Touch events for mobile
+                e.currentTarget.addEventListener('touchend', clear);
               }}
-              className="px-6 py-2.5 bg-[#EF4444] text-white rounded-full font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-red-100/50"
+              onTouchStart={(e) => {
+                const timer = setTimeout(triggerSOS, 1500);
+                const clear = () => clearTimeout(timer);
+                e.currentTarget.addEventListener('touchend', clear);
+              }}
+              className="px-4 lg:px-6 py-2 lg:py-2.5 bg-[#EF4444] text-white rounded-full font-black text-[9px] lg:text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-red-100/50"
             >
-              Hold for SOS
+              SOS
             </button>
             
             {profile.authenticated ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 lg:gap-4">
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)}
                   className="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative"
                 >
                   <Bell size={20} />
-                  {notifications.length > 0 && <span className={`absolute top-1 right-1 w-2 h-2 rounded-full border-2 border-white animate-pulse`} style={{ backgroundColor: theme.primary }}></span>}
+                  {notifications.length > 0 && <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-white animate-pulse`} style={{ backgroundColor: theme.primary }}></span>}
                 </button>
                 <button 
                   onClick={() => setView('profile')} 
                   style={{ backgroundColor: theme.primary }}
-                  className="h-10 w-10 rounded-full text-white flex items-center justify-center font-bold text-sm shadow-md border-2 border-white hover:scale-110 transition-transform overflow-hidden"
+                  className="h-8 w-8 lg:h-10 lg:w-10 rounded-full text-white flex items-center justify-center font-bold text-xs lg:text-sm shadow-md border-2 border-white hover:scale-105 transition-transform overflow-hidden"
                 >
                   {profile.profilePicture ? (
                     <img src={profile.profilePicture} alt="Profile" className="h-full w-full object-cover" />
@@ -183,7 +219,7 @@ const App: React.FC = () => {
               <button 
                 onClick={handleLogin} 
                 style={{ backgroundColor: theme.primary }}
-                className="text-white px-8 py-2.5 rounded-full font-black text-sm shadow-lg hover:opacity-90 transition-all flex items-center gap-2"
+                className="text-white px-5 lg:px-8 py-2 lg:py-2.5 rounded-full font-black text-xs lg:text-sm shadow-lg hover:opacity-90 transition-all"
               >
                 Sign In
               </button>
@@ -191,7 +227,7 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <div className="p-8 pb-32">
+        <div className="p-4 lg:p-8 pb-32">
           {currentView === 'dashboard' && profile.authenticated && (
             <Dashboard profile={profile} logs={logs} onAddLog={() => {}} />
           )}

@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   Home, Activity, Heart, Users, BookOpen, 
-  Settings, LogOut, ShieldAlert, UserCheck, User, Star
+  Settings, LogOut, ShieldAlert, UserCheck, User, Star, X
 } from 'lucide-react';
 import { AppView, UserProfile } from '../types';
 import { COLORS, SLOGAN } from '../constants';
@@ -12,9 +12,10 @@ interface NavigationProps {
   setView: (view: AppView) => void;
   profile: UserProfile;
   logout: () => void;
+  onClose?: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, logout }) => {
+const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, logout, onClose }) => {
   const theme = COLORS[profile.accent] || COLORS.pink;
   
   const navItems = [
@@ -32,14 +33,24 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, 
   }
 
   return (
-    <div className="w-64 bg-white h-screen border-r border-gray-100 flex flex-col shadow-sm fixed left-0 top-0 z-50">
-      <div className="p-8">
-        <h1 className="text-2xl font-black text-black">
-          AfterMa
-        </h1>
-        <p className="text-[10px] mt-1 tracking-widest font-bold text-black opacity-80">
-          {SLOGAN}
-        </p>
+    <div className="w-64 bg-white h-screen border-r border-gray-100 flex flex-col shadow-sm relative z-50">
+      <div className="p-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-black">
+            AfterMa
+          </h1>
+          <p className="text-[10px] mt-1 tracking-widest font-bold text-black opacity-80">
+            {SLOGAN}
+          </p>
+        </div>
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-2 -mr-4 text-gray-400 hover:text-gray-600"
+          >
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
@@ -51,7 +62,10 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, 
           return (
             <button
               key={item.id}
-              onClick={() => setView(item.id as AppView)}
+              onClick={() => {
+                setView(item.id as AppView);
+                if (onClose) onClose();
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
                 isActive 
                   ? 'text-white' 
