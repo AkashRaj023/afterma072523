@@ -1,51 +1,132 @@
 
 import React from 'react';
-import { Book, PlayCircle, HeartPulse, ShieldCheck } from 'lucide-react';
+import { Book, PlayCircle, HeartPulse, ShieldCheck, Video, FileText, ExternalLink, ArrowRight, Star } from 'lucide-react';
+import { GOVT_SCHEMES } from '../constants';
+import { UserProfile } from '../types';
+import { translations } from '../translations';
 
-const Education: React.FC = () => {
+// Define props to accept user profile from parent component
+interface EducationProps {
+  profile: UserProfile;
+}
+
+const Education: React.FC<EducationProps> = ({ profile }) => {
+  // Use translations based on user's preferred language
+  const lang = profile.journeySettings.language || 'english';
+  const t = translations[lang];
+
   const articles = [
-    { title: "Understanding the 'Fourth Trimester'", category: "Mental Health", readTime: "5 min" },
-    { title: "C-Section Incision Care 101", category: "Physical Recovery", readTime: "8 min" },
-    { title: "Nutrients for Iron Recovery", category: "Nutrition", readTime: "4 min" },
-    { title: "Managing Sleep Deprivation", category: "Lifestyle", readTime: "6 min" },
+    { title: "Understanding the 'Fourth Trimester'", category: "Mental Health", readTime: "5 min", summary: "The transition from pregnancy to motherhood requires a different kind of grace." },
+    { title: "C-Section Incision Care 101", category: "Physical Recovery", readTime: "8 min", summary: "Gentle techniques to ensure a smooth scar healing process." },
+    { title: "Nutrients for Iron Recovery", category: "Nutrition", readTime: "4 min", summary: "Traditional Indian superfoods to rebuild your vitality." },
+  ];
+
+  const trustedPicks = [
+    { brand: "Mamaearth", product: "Plant-Based Baby Wipes", reason: "Toxin-free & Biodegradable", tag: "Editor's Choice" },
+    { brand: "FirstCry", product: "Organic Nursing Pads", reason: "Super absorbent, naturally breathable", tag: "Best Seller" },
+    { brand: "Himalaya", product: "Ayurvedic Diaper Cream", reason: "Gentle healing since 1930", tag: "Trusted Heritage" }
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900">Recovery Resource Library</h1>
-        <p className="text-gray-500 max-w-2xl mx-auto">Evidence-based guides, medically-reviewed articles, and recovery programs accessible to all mothers.</p>
+    <div className="max-w-5xl mx-auto space-y-16 pb-20 animate-in">
+      <div className="text-center space-y-6 pt-10">
+        <h1 className="text-4xl lg:text-5xl font-black text-gray-900 leading-tight">{t.education.title}</h1>
+        <p className="text-gray-500 max-w-2xl mx-auto italic text-lg font-medium leading-relaxed">{t.education.subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <QuickLink icon={<Book className="text-pink-500" />} label="Guides" />
-        <QuickLink icon={<PlayCircle className="text-blue-500" />} label="Videos" />
-        <QuickLink icon={<HeartPulse className="text-red-500" />} label="Health Tips" />
-        <QuickLink icon={<ShieldCheck className="text-emerald-500" />} label="Med Safety" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <QuickLink icon={<Book className="text-pink-500" size={32} />} label={t.education.quickLinks.guides} />
+        <QuickLink icon={<PlayCircle className="text-blue-500" size={32} />} label={t.education.quickLinks.videos} />
+        <QuickLink icon={<HeartPulse className="text-red-500" size={32} />} label={t.education.quickLinks.tips} />
+        <QuickLink icon={<ShieldCheck className="text-emerald-500" size={32} />} label={t.education.quickLinks.safety} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {articles.map((art, idx) => (
-          <div key={idx} className="bg-white p-8 rounded-3xl border border-pink-50 flex gap-6 hover:shadow-lg transition-all cursor-pointer">
-            <div className="w-24 h-24 bg-pink-100 rounded-2xl shrink-0">
-               <img src={`https://picsum.photos/seed/${idx}/100/100`} className="w-full h-full object-cover rounded-2xl opacity-80" alt="Article" />
+      {/* Trusted Picks & Care Articles Newsletter Section */}
+      <section className="space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+           <div className="space-y-2">
+              <h2 className="text-3xl font-black text-gray-800">{t.education.newsletterTitle}</h2>
+              <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">{t.education.newsletterSub}</p>
+           </div>
+           <button className="flex items-center gap-2 text-pink-500 font-black text-xs uppercase tracking-widest hover:underline transition-all">{t.education.archive} <ArrowRight size={14} /></button>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+           {trustedPicks.map((pick, i) => (
+             <div key={i} className="bg-white p-8 rounded-[3rem] border border-gray-50 shadow-md hover:shadow-2xl transition-all group flex flex-col justify-between">
+                <div className="space-y-4">
+                   <div className="flex justify-between items-start">
+                      <span className="text-[8px] font-black uppercase px-3 py-1 bg-pink-50 text-pink-500 rounded-full">{pick.tag}</span>
+                      <Star size={16} className="text-amber-300" fill="currentColor" />
+                   </div>
+                   <h4 className="text-lg font-black text-gray-900">{pick.brand}: {pick.product}</h4>
+                   <p className="text-xs text-slate-500 font-medium leading-relaxed italic">"Because {pick.reason.toLowerCase()} is essential for your baby’s delicate skin and your peace of mind."</p>
+                </div>
+                <button className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-pink-500 transition-colors">Learn More <ArrowRight size={12} /></button>
+             </div>
+           ))}
+        </div>
+      </section>
+
+      <section className="space-y-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl lg:text-3xl font-black text-gray-800">{t.education.govtTitle}</h2>
+          <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest bg-gray-50 px-4 py-1.5 rounded-full shadow-inner">{t.education.govtSub}</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {GOVT_SCHEMES.map(scheme => (
+            <div key={scheme.title} className="bg-white p-8 rounded-[3rem] border border-gray-50 hover:border-blue-200 shadow-lg hover:shadow-2xl transition-all flex flex-col justify-between group">
+              <div className="space-y-5">
+                <div className="flex justify-between items-start">
+                  <div className="bg-blue-50 text-blue-500 p-4 rounded-2xl shadow-inner"><FileText size={28} /></div>
+                  <button className="p-3 bg-gray-50 text-slate-300 hover:text-blue-500 rounded-full transition-colors"><Video size={24} /></button>
+                </div>
+                <h3 className="text-2xl font-black text-gray-800 leading-tight">{scheme.title}</h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">{scheme.fullName}</p>
+                <div className="p-5 bg-blue-50/30 rounded-[1.5rem] border border-blue-50">
+                  <p className="text-sm font-black text-blue-700">{scheme.benefit}</p>
+                  <p className="text-[11px] text-blue-400 font-bold mt-2 italic">Eligibility: {scheme.eligibility}</p>
+                </div>
+              </div>
+              <button className="w-full mt-8 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
+                Apply Securely <ExternalLink size={16} />
+              </button>
             </div>
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-pink-500 uppercase tracking-widest">{art.category}</span>
-              <h3 className="text-xl font-bold text-gray-800">{art.title}</h3>
-              <p className="text-sm text-gray-400">Read time: {art.readTime}</p>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-8">
+        <h2 className="text-2xl lg:text-3xl font-black text-gray-800">{t.education.latestResources}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+          {articles.map((art, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-[3rem] border border-gray-50 flex flex-col sm:flex-row gap-8 hover:shadow-2xl transition-all cursor-pointer group shadow-md">
+              <div className="w-full sm:w-32 h-32 lg:w-40 lg:h-40 bg-pink-100 rounded-[2rem] shrink-0 overflow-hidden shadow-inner">
+                 <img src={`https://picsum.photos/seed/${idx + 10}/400/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Article" />
+              </div>
+              <div className="space-y-3 flex-1 py-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest bg-pink-50 px-3 py-1 rounded-full">{art.category}</span>
+                  <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">{art.readTime} {t.education.read}</span>
+                </div>
+                <h3 className="text-xl lg:text-2xl font-black text-gray-900 group-hover:text-pink-600 transition-colors leading-snug">{art.title}</h3>
+                <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">{art.summary}</p>
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase text-pink-500 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Full Guide <ArrowRight size={12} />
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
 
 const QuickLink = ({ icon, label }: any) => (
-  <div className="bg-white p-6 rounded-3xl text-center shadow-sm border border-gray-100 hover:border-pink-300 transition-all cursor-pointer">
-    <div className="flex justify-center mb-3">{icon}</div>
-    <span className="font-bold text-gray-700">{label}</span>
+  <div className="bg-white p-6 lg:p-8 rounded-[2.5rem] text-center shadow-md border border-gray-50 hover:border-pink-200 hover:shadow-xl transition-all cursor-pointer group">
+    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">{icon}</div>
+    <span className="font-black text-xs lg:text-sm text-gray-800 uppercase tracking-wider">{label}</span>
   </div>
 );
 

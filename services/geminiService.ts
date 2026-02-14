@@ -1,13 +1,13 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
-import { HealthLog, UserProfile } from "../types";
+import { GoogleGenAI } from "@google/genai";
+import { UserProfile } from "../types";
 
-const API_KEY = process.env.API_KEY || "";
+// Removed global API_KEY definition to use process.env.API_KEY directly in constructors as required.
+// Using 'gemini-3-pro-preview' for the reasoning-heavy triage task and 'gemini-3-flash-preview' for simple inspiration text.
 
 export const getTriageAnalysis = async (symptoms: string[], profile: UserProfile) => {
-  if (!API_KEY) return "AI services are currently unavailable. Please contact your doctor directly for emergencies.";
-
-  const ai = new GoogleGenAI({ apiKey: API_KEY });
+  // Always initialize GoogleGenAI with { apiKey: process.env.API_KEY } directly before usage.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `
     User is ${profile.deliveryType} postpartum (Date: ${profile.deliveryDate}).
     Symptoms reported: ${symptoms.join(", ")}.
@@ -22,12 +22,13 @@ export const getTriageAnalysis = async (symptoms: string[], profile: UserProfile
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-3-pro-preview",
       contents: prompt,
       config: {
         systemInstruction: "You are a clinical postpartum triage assistant. Your goal is to provide evidence-based, supportive guidance for new mothers. Always emphasize contacting a doctor if symptoms persist.",
       },
     });
+    // Access the .text property directly.
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
@@ -36,7 +37,8 @@ export const getTriageAnalysis = async (symptoms: string[], profile: UserProfile
 };
 
 export const getDailyInspiration = async (mood: number) => {
-  const ai = new GoogleGenAI({ apiKey: API_KEY });
+  // Use gemini-3-flash-preview for basic text tasks like short validations.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `Generate a short, calming, and validating 2-sentence inspiration for a new mother feeling a mood of ${mood}/10 (10 being great).`;
   
   try {
@@ -44,6 +46,7 @@ export const getDailyInspiration = async (mood: number) => {
       model: "gemini-3-flash-preview",
       contents: prompt,
     });
+    // Access the .text property directly.
     return response.text;
   } catch {
     return "You are doing an amazing job. Take it one breath at a time.";

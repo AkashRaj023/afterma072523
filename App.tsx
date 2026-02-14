@@ -11,8 +11,10 @@ import Settings from './components/Settings';
 import SOSOverlay from './components/SOSOverlay';
 import NotificationPanel from './components/NotificationPanel';
 import CareConnect from './components/CareConnect';
-import { Search, Bell, Menu, X as CloseIcon } from 'lucide-react';
+import MomKart from './components/Store';
+import { Search, Bell, Menu } from 'lucide-react';
 import { RECOVERY_DATABASE, COLORS } from './constants';
+import { translations } from './translations';
 
 const App: React.FC = () => {
   const [currentView, setView] = useState<AppView>('education');
@@ -72,11 +74,16 @@ const App: React.FC = () => {
     };
   });
 
+  const lang = profile.journeySettings.language || 'english';
+  const t = translations[lang];
+
   const [logs, setLogs] = useState<HealthLog[]>([]);
 
   useEffect(() => {
     localStorage.setItem('afterma_profile_v2', JSON.stringify(profile));
-  }, [profile]);
+    // Set HTML lang attribute for accessibility and styling
+    document.documentElement.lang = lang === 'hindi' ? 'hi' : 'en';
+  }, [profile, lang]);
 
   // Close mobile menu on view change
   useEffect(() => {
@@ -92,7 +99,7 @@ const App: React.FC = () => {
   const handleLogin = () => {
     setProfile(prev => ({ ...prev, name: "Aditi Sharma", authenticated: true, lastLoginDate: new Date().toISOString().split('T')[0] }));
     setView('dashboard');
-    addNotification(`Pranam Aditi`, `Welcome back to your healing journey.`);
+    addNotification(`${t.common.welcome} Aditi`, `Welcome back to your healing journey.`);
   };
 
   const logout = () => {
@@ -160,7 +167,7 @@ const App: React.FC = () => {
       </div>
       
       <main className="flex-1 w-full lg:ml-64 min-h-screen relative overflow-x-hidden">
-        <header className="h-16 lg:h-20 bg-white/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 flex items-center justify-between border-b border-pink-100/30">
+        <header className="h-16 lg:h-24 bg-white/95 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 flex items-center justify-between border-b border-gray-100 shadow-sm">
           <div className="flex items-center gap-4 lg:gap-6 flex-1">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
@@ -169,43 +176,45 @@ const App: React.FC = () => {
               <Menu size={24} />
             </button>
             
-            <div className="relative max-w-lg w-full hidden sm:block">
-              <Search className={`absolute left-4 top-1/2 -translate-y-1/2 ${profile.incognito ? 'text-purple-500' : 'text-gray-400'}`} size={18} />
+            <div className="relative max-w-xl w-full hidden sm:block">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 z-10">
+                <Search className={`${profile.incognito ? 'text-purple-500' : 'text-gray-400'}`} size={20} />
+              </div>
               <input 
                 type="text" 
-                placeholder={profile.incognito ? "Incognito Active..." : "Find activities..."}
-                className={`w-full border-none rounded-full py-2.5 pl-12 pr-20 focus:ring-2 transition-all text-sm ${profile.incognito ? 'bg-purple-50 focus:ring-purple-200' : 'bg-gray-50 focus:ring-pink-200'}`}
+                placeholder={profile.incognito ? t.common.incognito + " Active..." : t.common.searchPlaceholder}
+                className={`w-full border border-gray-50 rounded-full py-4 pl-14 pr-24 focus:ring-4 transition-all text-base font-medium shadow-lg shadow-gray-200/40 placeholder:text-gray-400 ${profile.incognito ? 'bg-purple-50/50 focus:ring-purple-100' : 'bg-gray-50/80 focus:ring-pink-100'}`}
               />
               <button 
                 onClick={() => setProfile(p => ({...p, incognito: !p.incognito}))}
-                className={`absolute right-3 top-1/2 -translate-y-1/2 text-[8px] font-black uppercase px-2 py-1 rounded-full transition-all ${profile.incognito ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
+                className={`absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase px-3 py-1.5 rounded-full transition-all tracking-wider ${profile.incognito ? 'bg-purple-500 text-white shadow-md' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
               >
-                {profile.incognito ? 'Hide' : 'Ghost'}
+                {profile.incognito ? t.common.hidden : t.common.incognito}
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 lg:gap-6">
+          <div className="flex items-center gap-3 lg:gap-6 ml-4">
             <button 
               onClick={handleSOSClick}
-              className="px-4 lg:px-6 py-2 lg:py-2.5 bg-[#EF4444] text-white rounded-full font-black text-[9px] lg:text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-red-100/50"
+              className="px-4 lg:px-6 py-2.5 lg:py-3 bg-[#EF4444] text-white rounded-full font-black text-[9px] lg:text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2 shadow-xl shadow-red-200"
             >
-              Double tap for SOS
+              {t.common.sos}
             </button>
             
             {profile.authenticated ? (
               <div className="flex items-center gap-2 lg:gap-4">
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative"
+                  className="p-3 text-gray-500 hover:bg-gray-50 rounded-full relative transition-colors"
                 >
-                  <Bell size={20} />
-                  {notifications.length > 0 && <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full border-2 border-white animate-pulse`} style={{ backgroundColor: theme.primary }}></span>}
+                  <Bell size={22} />
+                  {notifications.length > 0 && <span className={`absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full border-2 border-white animate-pulse`} style={{ backgroundColor: theme.primary }}></span>}
                 </button>
                 <button 
                   onClick={() => setView('profile')} 
                   style={{ backgroundColor: theme.primary }}
-                  className="h-8 w-8 lg:h-10 lg:w-10 rounded-full text-white flex items-center justify-center font-bold text-xs lg:text-sm shadow-md border-2 border-white hover:scale-105 transition-transform overflow-hidden"
+                  className="h-10 w-10 lg:h-12 lg:w-12 rounded-full text-white flex items-center justify-center font-bold text-sm lg:text-base shadow-lg border-2 border-white hover:scale-110 transition-transform overflow-hidden"
                 >
                   {profile.profilePicture ? (
                     <img src={profile.profilePicture} alt="Profile" className="h-full w-full object-cover" />
@@ -218,9 +227,9 @@ const App: React.FC = () => {
               <button 
                 onClick={handleLogin} 
                 style={{ backgroundColor: theme.primary }}
-                className="text-white px-5 lg:px-8 py-2 lg:py-2.5 rounded-full font-black text-xs lg:text-sm shadow-lg hover:opacity-90 transition-all"
+                className="text-white px-6 lg:px-10 py-3 lg:py-3.5 rounded-full font-black text-xs lg:text-sm shadow-xl hover:opacity-90 transition-all"
               >
-                Sign In
+                {t.common.signIn}
               </button>
             )}
           </div>
@@ -238,8 +247,9 @@ const App: React.FC = () => {
               activities={filteredActivities} 
             />
           )}
-          {currentView === 'mental' && profile.authenticated && <MentalWellness />}
-          {currentView === 'education' && <Education />}
+          {currentView === 'mental' && profile.authenticated && <MentalWellness profile={profile} />}
+          {currentView === 'education' && <Education profile={profile} />}
+          {currentView === 'momkart' && profile.authenticated && <MomKart profile={profile} />}
           {currentView === 'membership' && <Membership profile={profile} setProfile={setProfile} />}
           {currentView === 'profile' && profile.authenticated && <Settings profile={profile} setProfile={setProfile} />}
           {currentView === 'care-connect' && profile.authenticated && (

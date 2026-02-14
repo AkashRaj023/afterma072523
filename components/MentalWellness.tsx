@@ -1,13 +1,22 @@
 
-import React, { useState } from 'react';
-import { Brain, Heart, Edit3, Sparkles, MessageCircle, AlertTriangle, Phone, ShieldCheck, CheckSquare, Music } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Brain, Heart, Edit3, Sparkles, MessageCircle, AlertTriangle, Phone, ShieldCheck, CheckSquare, Music, Star } from 'lucide-react';
 import { EPDS_QUESTIONS, HELPLINES, STABILIZATION_TASKS, COLORS } from '../constants';
+import { UserProfile } from '../types';
+import { translations } from '../translations';
 
-const MentalWellness: React.FC = () => {
+interface MentalProps {
+  profile: UserProfile;
+}
+
+const MentalWellness: React.FC<MentalProps> = ({ profile }) => {
+  const lang = profile.journeySettings.language || 'english';
+  const t = translations[lang];
   const [showEPDS, setShowEPDS] = useState(false);
   const [epdsStep, setEpdsStep] = useState(0);
   const [epdsScore, setEpdsScore] = useState(0);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [showHug, setShowHug] = useState(false);
 
   const handleEPDSAnswer = (points: number) => {
     setEpdsScore(prev => prev + points);
@@ -15,26 +24,58 @@ const MentalWellness: React.FC = () => {
       setEpdsStep(epdsStep + 1);
     } else {
       setShowEPDS(false);
-      alert(`Healing Check-in Complete. Your emotional state is logged with care for your steady progress.`);
+      alert(lang === 'hindi' ? `हीलिंग चेक-इन पूरा हुआ। आपकी भावनात्मक स्थिति आपकी स्थिर प्रगति के लिए ध्यान से लॉग की गई है।` : `Healing Check-in Complete. Your emotional state is logged with care for your steady progress.`);
       setEpdsStep(0);
       setEpdsScore(0);
     }
   };
 
   const toggleTask = (task: string) => {
-    setCompletedTasks(prev => 
-      prev.includes(task) ? prev.filter(t => t !== task) : [...prev, task]
-    );
+    setCompletedTasks(prev => {
+      const isRemoving = prev.includes(task);
+      const next = isRemoving ? prev.filter(t => t !== task) : [...prev, task];
+      
+      // Trigger hug animation if all tasks completed and we just added the last one
+      if (!isRemoving && next.length === STABILIZATION_TASKS.length) {
+        setShowHug(true);
+      }
+      return next;
+    });
   };
 
+  useEffect(() => {
+    if (showHug) {
+      const timer = setTimeout(() => setShowHug(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showHug]);
+
   return (
-    <div className="max-w-5xl mx-auto space-y-10 pb-20 animate-in">
+    <div className="max-w-5xl mx-auto space-y-10 pb-20 animate-in relative">
+      {/* Teddy Bear Hug Animation Overlay */}
+      {showHug && (
+        <div className="fixed inset-0 pointer-events-none z-[110] flex items-center justify-center">
+          <div className="bg-white/80 backdrop-blur-md p-10 rounded-[4rem] shadow-2xl border-4 border-pink-100 flex flex-col items-center gap-6 hug-animation">
+            <div className="text-8xl">🧸</div>
+            <div className="text-center">
+              <h3 className="text-2xl font-black text-pink-600">{t.mental.hugTitle}</h3>
+              <p className="text-pink-400 font-bold">{t.mental.hugSub}</p>
+            </div>
+            <div className="flex gap-2 text-pink-300">
+               <Star size={24} fill="currentColor" />
+               <Star size={24} fill="currentColor" />
+               <Star size={24} fill="currentColor" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="bg-white p-12 rounded-[3.5rem] shadow-sm border border-slate-50 col-span-1 md:col-span-2 space-y-10">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-4xl font-black text-gray-800 leading-tight">Emotional Haven</h2>
-              <p className="text-slate-400 font-medium italic">A safe, non-judgmental space for your mind to rest.</p>
+              <h2 className="text-4xl font-black text-gray-800 leading-tight">{t.mental.title}</h2>
+              <p className="text-slate-400 font-medium italic">{t.mental.subtitle}</p>
             </div>
             <div className="h-14 w-14 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center shadow-inner">
                <ShieldCheck size={32} />
@@ -43,16 +84,16 @@ const MentalWellness: React.FC = () => {
           
           {!showEPDS ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <MentalAction icon={<Heart className="text-rose-300" />} title="Healing Check-in" subtitle="EPDS Screening" onClick={() => setShowEPDS(true)} />
-              <MentalAction icon={<Edit3 className="text-indigo-300" />} title="Gentle Journal" subtitle="Daily Reflections" onClick={() => {}} />
-              <MentalAction icon={<Sparkles className="text-amber-300" />} title="Moment of Calm" subtitle="Grounding Loops" onClick={() => {}} />
-              <MentalAction icon={<Music className="text-emerald-300" />} title="Safe Sounds" subtitle="Bonding Audio" onClick={() => {}} />
+              <MentalAction icon={<Heart className="text-rose-300" />} title={t.mental.actions.checkin} subtitle={t.mental.actions.checkinSub} onClick={() => setShowEPDS(true)} />
+              <MentalAction icon={<Edit3 className="text-indigo-300" />} title={t.mental.actions.journal} subtitle={t.mental.actions.journalSub} onClick={() => {}} />
+              <MentalAction icon={<Sparkles className="text-amber-300" />} title={t.mental.actions.calm} subtitle={t.mental.actions.calmSub} onClick={() => {}} />
+              <MentalAction icon={<Music className="text-emerald-300" />} title={t.mental.actions.sounds} subtitle={t.mental.actions.soundsSub} onClick={() => {}} />
             </div>
           ) : (
             <div className="bg-slate-50/50 rounded-[2.5rem] p-10 border border-slate-100 animate-in zoom-in-95">
               <div className="flex justify-between items-center mb-10">
                 <span className="text-[10px] font-black text-slate-400 bg-white px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">Reflection {epdsStep + 1} of 10</span>
-                <button onClick={() => setShowEPDS(false)} className="text-slate-300 font-bold text-sm uppercase hover:text-slate-500 transition-colors">Close</button>
+                <button onClick={() => setShowEPDS(false)} className="text-slate-300 font-bold text-sm uppercase hover:text-slate-500 transition-colors">{t.common.close}</button>
               </div>
               <h3 className="text-3xl font-black text-gray-700 mb-10 leading-tight">{EPDS_QUESTIONS[epdsStep]}</h3>
               <div className="grid gap-4">
@@ -73,7 +114,7 @@ const MentalWellness: React.FC = () => {
           <div className="pt-10 border-t border-slate-50 space-y-6">
              <h3 className="text-xl font-black text-gray-800 flex items-center gap-3">
                <CheckSquare className="text-emerald-300" size={24} />
-               Daily Comfort Tasks
+               {t.mental.tasksTitle}
              </h3>
              <div className="grid gap-3">
                {STABILIZATION_TASKS.map(task => (
@@ -101,7 +142,7 @@ const MentalWellness: React.FC = () => {
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="text-rose-100" size={32} />
-                <h3 className="text-2xl font-black">Urgent Support</h3>
+                <h3 className="text-2xl font-black">{t.mental.urgentTitle}</h3>
               </div>
               <div className="space-y-2">
                 <p className="text-[10px] font-black text-rose-100 uppercase tracking-widest">{HELPLINES.india.name}</p>
@@ -110,10 +151,10 @@ const MentalWellness: React.FC = () => {
                 </a>
               </div>
               <p className="text-xs text-rose-50 leading-relaxed font-medium">
-                Feeling heavy is okay. Talking helps. Reach out to our verified partners for a gentle conversation.
+                {t.mental.urgentSub}
               </p>
               <button className="w-full py-4 bg-white text-rose-500 rounded-2xl font-black shadow-lg hover:scale-105 transition-transform">
-                Connect Now
+                {t.mental.connectNow}
               </button>
             </div>
             <Heart size={150} className="absolute bottom-[-40px] right-[-20px] opacity-10" />
@@ -122,16 +163,16 @@ const MentalWellness: React.FC = () => {
           <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 space-y-6">
             <h3 className="text-xl font-black text-gray-800 flex items-center gap-3">
               <Brain size={24} className="text-rose-300" />
-              Gentle Check-in
+              {t.mental.checkInTitle}
             </h3>
             <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-50 text-center">
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">How are you feeling?</p>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">{t.mental.checkInSub}</p>
                <div className="flex justify-between items-center px-2">
                   {['😔', '😐', '🙂', '😊', '🌟'].map((e, i) => (
                     <button key={i} className="text-4xl hover:scale-150 transition-transform active:scale-95 drop-shadow-sm">{e}</button>
                   ))}
                </div>
-               <p className="mt-8 text-[11px] font-bold text-rose-400 italic">Your feelings are valid and safe here.</p>
+               <p className="mt-8 text-[11px] font-bold text-rose-400 italic">{t.mental.checkInFoot}</p>
             </div>
           </div>
         </div>

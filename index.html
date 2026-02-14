@@ -6,12 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AfterMa | Postpartum Wellness</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
       background-color: #FFF5F7;
       color: #374151;
+      overflow-x: hidden;
     }
     .animate-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -39,6 +40,43 @@
     .scrollbar-hide {
       -ms-overflow-style: none;
       scrollbar-width: none;
+    }
+
+    /* Cylindrical Theme Transition Effect */
+    .theme-transition-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: linear-gradient(90deg, transparent 0%, currentColor 50%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .theme-transition-active {
+      animation: sweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes sweep {
+      0% { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+      50% { opacity: 0.15; }
+      100% { transform: translateX(100%) skewX(-15deg); opacity: 0; }
+    }
+
+    /* Teddy Bear Hug Animation */
+    .hug-animation {
+      animation: hugEffect 2.5s ease-in-out forwards;
+    }
+    @keyframes hugEffect {
+      0% { transform: scale(0.5); opacity: 0; }
+      20% { transform: scale(1.2); opacity: 1; }
+      40% { transform: scale(1); }
+      60% { transform: scale(1.1); }
+      80% { transform: scale(1); opacity: 1; }
+      100% { transform: translateY(-50px); opacity: 0; }
+    }
+    
+    /* Ensure Hindi text has appropriate line-height */
+    [lang="hindi"] {
+      line-height: 1.6;
     }
   </style>
 <script type="importmap">

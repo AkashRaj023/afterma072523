@@ -11,6 +11,7 @@ import {
 import { UserProfile, HealthLog } from '../types';
 import { getDailyInspiration } from '../services/geminiService';
 import { NUTRITION_GUIDE, RECOVERY_DATABASE, COLORS } from '../constants';
+import { translations } from '../translations';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -19,17 +20,21 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
-  const [inspiration, setInspiration] = useState("Wishing you a gentle recovery today...");
+  const lang = profile.journeySettings.language || 'english';
+  const t = translations[lang];
+  const [inspiration, setInspiration] = useState(t.dashboard.inspiration);
   const lastLog = logs[logs.length - 1];
   const theme = COLORS[profile.accent] || COLORS.pink;
 
   useEffect(() => {
     const fetchInspiration = async () => {
+      // Small optimization: don't fetch from AI for translation if basic fallback is fine
+      // but the service could technically be multi-lingual too.
       const msg = await getDailyInspiration(lastLog?.moodLevel || 5);
       setInspiration(msg);
     };
     fetchInspiration();
-  }, [lastLog]);
+  }, [lastLog, lang]);
 
   const chartData = useMemo(() => {
     if (logs.length === 0) return [{ time: 'Today', mood: 5, pain: 2 }];
@@ -66,16 +71,16 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
             </div>
 
             <div className="space-y-2 lg:space-y-4">
-              <h2 className="text-2xl lg:text-4xl font-black tracking-tight" style={{ color: theme.bg }}>Pranam, {profile.name}</h2>
+              <h2 className="text-2xl lg:text-4xl font-black tracking-tight" style={{ color: theme.bg }}>{t.common.welcome}, {profile.name}</h2>
               <p className="opacity-95 max-w-lg italic text-sm lg:text-xl leading-relaxed font-medium" style={{ color: theme.bg }}>"{inspiration}"</p>
               <div className="pt-2 flex flex-wrap gap-2 lg:gap-4 justify-center lg:justify-start">
                  <div className="flex items-center gap-2 bg-white/20 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full backdrop-blur-md border border-white/10">
                    <Zap size={14} className="text-amber-200" fill="currentColor" />
-                   <span className="font-bold text-[10px] lg:text-sm" style={{ color: theme.bg }}>{profile.streakCount} Gentle Days</span>
+                   <span className="font-bold text-[10px] lg:text-sm" style={{ color: theme.bg }}>{profile.streakCount} {t.dashboard.streakSuffix}</span>
                  </div>
                  <div className="flex items-center gap-2 bg-white/20 px-4 lg:px-5 py-1.5 lg:py-2 rounded-full backdrop-blur-md border border-white/10">
                    <Star size={14} className="text-white opacity-80" fill="currentColor" />
-                   <span className="font-bold text-[10px] lg:text-sm" style={{ color: theme.bg }}>{profile.completedActivities.length * 20} Progress</span>
+                   <span className="font-bold text-[10px] lg:text-sm" style={{ color: theme.bg }}>{profile.completedActivities.length * 20} {t.dashboard.progressSuffix}</span>
                  </div>
               </div>
             </div>
@@ -87,7 +92,7 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
             style={{ color: theme.text }}
           >
             <Plus size={20} />
-            Log Moment
+            {t.dashboard.logMoment}
           </button>
         </div>
         <div className="absolute bottom-[-15%] right-[-5%] opacity-10 pointer-events-none scale-150" style={{ color: theme.bg }}>
@@ -109,7 +114,7 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
                  <Play fill="currentColor" size={20} />
               </div>
               <div className="space-y-0.5 lg:space-y-1">
-                 <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest" style={{ color: theme.primary }}>Comforting Next Step</span>
+                 <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest" style={{ color: theme.primary }}>{t.dashboard.nextStep}</span>
                  <h3 className="text-lg lg:text-2xl font-black text-gray-800 line-clamp-1">{nextActivity.title}</h3>
                  <p className="text-xs lg:text-sm text-gray-400 font-medium line-clamp-1">{nextActivity.description}</p>
               </div>
@@ -118,24 +123,24 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
             className="w-full md:w-auto px-6 lg:px-8 py-2.5 lg:py-3 rounded-xl lg:rounded-2xl font-black flex items-center justify-center gap-2 group-hover:text-white transition-all shadow-sm text-xs lg:text-sm"
             style={{ backgroundColor: theme.bg, color: theme.text }}
            >
-             Start Softly <ArrowRight size={16} />
+             {t.dashboard.startSoftly} <ArrowRight size={16} />
            </button>
         </div>
       )}
 
       {/* Grid Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        <StatCard icon={<Droplet className="text-blue-400" />} label="Hydration" value={`${lastLog?.waterIntake || 0}/10`} unit="glass" color="bg-blue-50/50" />
-        <StatCard icon={<Moon className="text-indigo-300" />} label="Rest Time" value={`${lastLog?.sleepHours || 0}`} unit="hrs" color="bg-indigo-50/50" />
-        <StatCard icon={<Pill className="text-emerald-300" />} label="Self-Care" value={lastLog?.medicationsTaken ? "Done" : "1 Task"} unit="" color="bg-emerald-50/50" />
-        <StatCard icon={<Activity className="text-rose-300" />} label="Gentle Core" value={`${lastLog?.kegelCount || 0}`} unit="sets" color="bg-rose-50/50" />
+        <StatCard icon={<Droplet className="text-blue-400" />} label={t.dashboard.stats.hydration} value={`${lastLog?.waterIntake || 0}/10`} unit="" color="bg-blue-50/50" />
+        <StatCard icon={<Moon className="text-indigo-300" />} label={t.dashboard.stats.rest} value={`${lastLog?.sleepHours || 0}`} unit="" color="bg-indigo-50/50" />
+        <StatCard icon={<Pill className="text-emerald-300" />} label={t.dashboard.stats.selfcare} value={lastLog?.medicationsTaken ? "Done" : "1 Task"} unit="" color="bg-emerald-50/50" />
+        <StatCard icon={<Activity className="text-rose-300" />} label={t.dashboard.stats.kegel} value={`${lastLog?.kegelCount || 0}`} unit="" color="bg-rose-50/50" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         <div className="lg:col-span-2 bg-white p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[3rem] shadow-sm border border-slate-50">
           <div className="mb-6 lg:mb-10">
-            <h3 className="text-xl lg:text-2xl font-black text-gray-800">Healing Pulse</h3>
-            <p className="text-xs lg:text-sm text-slate-400 font-bold">A steady look at your recovery journey</p>
+            <h3 className="text-xl lg:text-2xl font-black text-gray-800">{t.dashboard.healingPulse}</h3>
+            <p className="text-xs lg:text-sm text-slate-400 font-bold">{t.dashboard.healingPulseSub}</p>
           </div>
           <div className="h-48 lg:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -160,7 +165,7 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
         <div className="bg-white p-6 lg:p-10 rounded-[2.5rem] lg:rounded-[3rem] shadow-sm border border-slate-50 flex flex-col justify-between">
            <h3 className="text-lg lg:text-xl font-black text-gray-800 flex items-center gap-3">
              <Leaf size={20} className="text-emerald-300" />
-             Warm Nutrition
+             {t.dashboard.warmNutrition}
            </h3>
            <div className="space-y-4 my-6 lg:my-8">
               {NUTRITION_GUIDE.slice(0, 2).map((item, idx) => (
@@ -174,7 +179,7 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog }) => {
               ))}
            </div>
            <button className="w-full py-3 lg:py-4 border-2 border-dashed rounded-[1.5rem] lg:rounded-3xl font-black text-xs lg:text-sm hover:opacity-70 transition-colors" style={{ color: theme.text, borderColor: theme.primary }}>
-              Healing Recipes
+              {t.dashboard.recipes}
            </button>
         </div>
       </div>

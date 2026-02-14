@@ -36,7 +36,7 @@ export interface CaregiverInfo {
 export interface Appointment {
   id: string;
   specialistName: string;
-  type: 'OBGYN' | 'Physio' | 'Lactation';
+  type: 'OBGYN' | 'Physio' | 'Lactation' | 'MentalHealth';
   date: string;
   time: string;
   status: 'Upcoming' | 'Completed' | 'Cancelled';
@@ -48,6 +48,21 @@ export interface CommunityCircle {
   members: number;
   description: string;
   isJoined: boolean;
+}
+
+export interface StoreItem {
+  id: string;
+  name: string;
+  brand: string;
+  category: 'Baby Care' | 'Recovery' | 'Nutrition' | 'Devices';
+  price: number;
+  image: string;
+  description: string;
+  rating: number;
+}
+
+export interface CartItem extends StoreItem {
+  quantity: number;
 }
 
 export interface UserProfile {
@@ -106,6 +121,7 @@ export type AppView =
   | 'physical' 
   | 'mental' 
   | 'care-connect' 
+  | 'momkart'
   | 'profile'
   | 'membership'
   | 'caregiver';

@@ -2,10 +2,11 @@
 import React from 'react';
 import { 
   Home, Activity, Heart, Users, BookOpen, 
-  Settings, LogOut, ShieldAlert, UserCheck, User, Star, X
+  Settings, LogOut, UserCheck, Star, X, ShoppingBag
 } from 'lucide-react';
 import { AppView, UserProfile } from '../types';
 import { COLORS, SLOGAN } from '../constants';
+import { translations } from '../translations';
 
 interface NavigationProps {
   currentView: AppView;
@@ -17,19 +18,22 @@ interface NavigationProps {
 
 const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, logout, onClose }) => {
   const theme = COLORS[profile.accent] || COLORS.pink;
+  const lang = profile.journeySettings.language || 'english';
+  const t = translations[lang];
   
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home, private: true },
-    { id: 'physical', label: 'Recovery Journey', icon: Activity, private: true },
-    { id: 'mental', label: 'Mental Wellness', icon: Heart, private: true },
-    { id: 'care-connect', label: 'Care Connect', icon: Users, private: true },
-    { id: 'education', label: 'Learning Center', icon: BookOpen, private: false },
-    { id: 'profile', label: 'Settings', icon: Settings, private: true },
-    { id: 'membership', label: 'AfterMa Plus', icon: Star, private: true },
+    { id: 'dashboard', label: t.nav.dashboard, icon: Home, private: true },
+    { id: 'physical', label: t.nav.physical, icon: Activity, private: true },
+    { id: 'mental', label: t.nav.mental, icon: Heart, private: true },
+    { id: 'care-connect', label: t.nav.care, icon: Users, private: true },
+    { id: 'momkart', label: t.nav.momkart, icon: ShoppingBag, private: true },
+    { id: 'education', label: t.nav.education, icon: BookOpen, private: false },
+    { id: 'profile', label: t.nav.settings, icon: Settings, private: true },
+    { id: 'membership', label: t.nav.membership, icon: Star, private: true },
   ];
 
   if (profile.role === 'caregiver') {
-    navItems.unshift({ id: 'caregiver', label: 'Caregiver Hub', icon: UserCheck, private: true });
+    navItems.unshift({ id: 'caregiver', label: t.nav.caregiver, icon: UserCheck, private: true });
   }
 
   return (
@@ -92,7 +96,7 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, setView, profile, 
             className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-50 rounded-xl transition-all text-sm font-bold"
           >
             <LogOut size={18} />
-            <span>Sign Out</span>
+            <span>{t.common.signOut}</span>
           </button>
         )}
       </div>
