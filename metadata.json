@@ -1,0 +1,8 @@
+{
+  "name": "AfterMa: Postpartum Recovery & Wellness",
+  "description": "A comprehensive, mother-centric platform for postpartum physical rehabilitation and mental wellness, featuring recovery tracking, mood monitoring, and AI-driven symptom triage.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
