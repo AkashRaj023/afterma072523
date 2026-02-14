@@ -55,7 +55,10 @@ export const translations: any = {
       restricted: "Access Restricted",
       restrictedSub: "Complete your current focus to unlock more modules.",
       logCompletion: "Log Completion",
-      timer: "Timer"
+      timer: "Timer",
+      activeTitle: "Active Focus",
+      intensityLabel: "Intensity",
+      durationLabel: "Duration"
     },
     mental: {
       title: "Emotional Haven",
@@ -151,6 +154,23 @@ export const translations: any = {
       accent: "Application Accent Color",
       language: "Interface Language",
       apply: "Apply Customizations",
+      journey: {
+        title: "Tuning Your Recovery",
+        subtitle: "Adjust your journey's pace and goals to match your energy levels and physical readiness.",
+        paceTitle: "Recovery Pace",
+        paceSub: "Gentle limits intensity to early-stage safe movements.",
+        commitmentTitle: "Daily Commitment",
+        commitmentSub: "How many minutes can you spare for yourself today?",
+        focusTitle: "Healing Focus Areas",
+        focusSub: "We'll prioritize content based on your selections.",
+        goals: {
+          pelvic: "Pelvic Floor Health",
+          core: "Core Stability",
+          mobility: "General Mobility",
+          energy: "Energy Boosting",
+          posture: "Nursing Posture"
+        }
+      },
       notifications: {
         title: "Nurturing Nudges",
         subtitle: "Set your preferred frequency for gentle reminders that support your healing.",
@@ -232,7 +252,10 @@ export const translations: any = {
       restricted: "पहुंच प्रतिबंधित",
       restrictedSub: "अधिक मॉड्यूल अनलॉक करने के लिए अपना वर्तमान ध्यान पूरा करें।",
       logCompletion: "पूर्णता लॉग करें",
-      timer: "टाइमर"
+      timer: "टाइमर",
+      activeTitle: "सक्रिय ध्यान",
+      intensityLabel: "तीव्रता",
+      durationLabel: "अवधि"
     },
     mental: {
       title: "भावनात्मक आश्रय",
@@ -328,6 +351,23 @@ export const translations: any = {
       accent: "एप्लीकेशन एक्सेंट कलर",
       language: "इंटरफेस भाषा",
       apply: "कस्टमाइजेशन लागू करें",
+      journey: {
+        title: "रिकवरी की ट्यूनिंग",
+        subtitle: "अपनी ऊर्जा के स्तर और शारीरिक स्थिति के अनुसार अपनी यात्रा की गति और लक्ष्यों को समायोजित करें।",
+        paceTitle: "रिकवरी की गति",
+        paceSub: "कोमल गति तीव्रता को शुरुआती चरण के सुरक्षित व्यायामों तक सीमित रखती है।",
+        commitmentTitle: "दैनिक प्रतिबद्धता",
+        commitmentSub: "आज आप अपने लिए कितने मिनट निकाल सकते हैं?",
+        focusTitle: "हीलिंग फोकस क्षेत्र",
+        focusSub: "हम आपकी पसंद के आधार पर सामग्री को प्राथमिकता देंगे।",
+        goals: {
+          pelvic: "पेल्विक फ्लोर स्वास्थ्य",
+          core: "कोर स्थिरता",
+          mobility: "सामान्य गतिशीलता",
+          energy: "ऊर्जा बढ़ाना",
+          posture: "नर्सिंग पोस्चर"
+        }
+      },
       notifications: {
         title: "कोमल सूचनाएं",
         subtitle: "अपनी रिकवरी में मदद के लिए कोमल अनुस्मारक सेट करें।",

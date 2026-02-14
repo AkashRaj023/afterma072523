@@ -1,10 +1,11 @@
 
 import React, { useState, useRef } from 'react';
 import { UserProfile, RecoveryPace, ThemeAccent, Language } from '../types';
+// Added Zap to the import list to fix the missing name error
 import { 
   Save, User, Shield, Palette, Target, 
   Lock, Eye, Check, Trash2, Camera, Upload, Bell,
-  Activity, Users, Clipboard, Calendar, Heart
+  Activity, Users, Clipboard, Calendar, Heart, Clock, Focus, Zap
 } from 'lucide-react';
 import { COLORS } from '../constants';
 import { translations } from '../translations';
@@ -38,6 +39,16 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
     setTimeout(() => {
       setIsTransitioning(false);
     }, 1200);
+  };
+
+  const toggleGoal = (goalKey: string) => {
+    setProfile(prev => {
+      const currentGoals = prev.journeySettings.goals || [];
+      const newGoals = currentGoals.includes(goalKey)
+        ? currentGoals.filter(g => g !== goalKey)
+        : [...currentGoals, goalKey];
+      return { ...prev, journeySettings: { ...prev.journeySettings, goals: newGoals } };
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,27 +150,98 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
         )}
 
         {activeTab === 'journey' && (
-          <div className="space-y-10">
-            <h3 className="text-3xl font-black text-gray-900 flex items-center gap-4">
-              <div className="p-3 bg-gray-50 rounded-2xl" style={{ color: currentTheme.primary }}><Target /></div>
-              Journey Tuning
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div className="space-y-12 animate-in fade-in">
+            <div className="space-y-2">
+              <h3 className="text-3xl font-black text-gray-900 flex items-center gap-4">
+                <div className="p-3 bg-gray-50 rounded-2xl" style={{ color: currentTheme.primary }}><Target /></div>
+                {t.settings.journey.title}
+              </h3>
+              <p className="text-sm text-gray-400 font-medium italic leading-relaxed">{t.settings.journey.subtitle}</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Pace Control */}
               <div className="space-y-4">
-                <label className="text-xs font-black uppercase text-gray-400 tracking-widest">Recovery Intensity Pace</label>
-                <div className="flex bg-gray-50 p-1.5 rounded-3xl border border-gray-100">
+                <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
+                    <Activity size={14} /> {t.settings.journey.paceTitle}
+                  </label>
+                  <p className="text-[10px] text-slate-400 font-bold">{t.settings.journey.paceSub}</p>
+                </div>
+                <div className="flex bg-slate-50 p-1.5 rounded-[2rem] border border-slate-100 shadow-inner">
                    <button 
                     onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, pace: 'gentle' } })}
-                    className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all ${profile.journeySettings.pace === 'gentle' ? 'bg-white shadow-md' : 'text-gray-400'}`}
+                    className={`flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${profile.journeySettings.pace === 'gentle' ? 'bg-white shadow-md' : 'text-slate-400'}`}
                     style={{ color: profile.journeySettings.pace === 'gentle' ? currentTheme.primary : '' }}
                    >Gentle</button>
                    <button 
                     onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, pace: 'moderate' } })}
-                    className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all ${profile.journeySettings.pace === 'moderate' ? 'bg-white shadow-md' : 'text-gray-400'}`}
+                    className={`flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${profile.journeySettings.pace === 'moderate' ? 'bg-white shadow-md' : 'text-slate-400'}`}
                     style={{ color: profile.journeySettings.pace === 'moderate' ? currentTheme.primary : '' }}
                    >Moderate</button>
                 </div>
               </div>
+
+              {/* Commitment Control */}
+              <div className="space-y-4">
+                 <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
+                    <Clock size={14} /> {t.settings.journey.commitmentTitle}
+                  </label>
+                  <p className="text-[10px] text-slate-400 font-bold">{t.settings.journey.commitmentSub}</p>
+                </div>
+                <div className="flex items-center gap-4 bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
+                   <input 
+                    type="range" 
+                    min="5" 
+                    max="60" 
+                    step="5"
+                    className="flex-1 accent-pink-500 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                    style={{ accentColor: currentTheme.primary }}
+                   />
+                   <span className="font-black text-xl w-16 text-right" style={{ color: currentTheme.text }}>15m</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Focus Areas Checklist */}
+            <div className="space-y-6">
+               <div className="space-y-1">
+                  <label className="text-xs font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
+                    <Focus size={14} /> {t.settings.journey.focusTitle}
+                  </label>
+                  <p className="text-[10px] text-slate-400 font-bold">{t.settings.journey.focusSub}</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <CheckItem 
+                    icon={<Activity size={16} />} 
+                    label={t.settings.journey.goals.pelvic} 
+                    active={profile.journeySettings.goals?.includes('pelvic')} 
+                    onChange={() => toggleGoal('pelvic')} 
+                    theme={currentTheme}
+                  />
+                  <CheckItem 
+                    icon={<Target size={16} />} 
+                    label={t.settings.journey.goals.core} 
+                    active={profile.journeySettings.goals?.includes('core')} 
+                    onChange={() => toggleGoal('core')} 
+                    theme={currentTheme}
+                  />
+                  <CheckItem 
+                    icon={<Activity size={16} />} 
+                    label={t.settings.journey.goals.mobility} 
+                    active={profile.journeySettings.goals?.includes('mobility')} 
+                    onChange={() => toggleGoal('mobility')} 
+                    theme={currentTheme}
+                  />
+                  <CheckItem 
+                    icon={<Zap size={16} />} 
+                    label={t.settings.journey.goals.energy} 
+                    active={profile.journeySettings.goals?.includes('energy')} 
+                    onChange={() => toggleGoal('energy')} 
+                    theme={currentTheme}
+                  />
+                </div>
             </div>
           </div>
         )}
@@ -281,7 +363,6 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
                </div>
                
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 {/* Fix: Heart icon was not imported from lucide-react */}
                  <CheckItem 
                   icon={<Heart size={16} />} 
                   label={t.settings.privacy.canMood} 
