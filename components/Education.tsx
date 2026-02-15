@@ -5,20 +5,17 @@ import { GOVT_SCHEMES } from '../constants';
 import { UserProfile } from '../types';
 import { translations } from '../translations';
 
-// Define props to accept user profile from parent component
-interface EducationProps {
-  profile: UserProfile;
-}
+interface EducationProps { profile: UserProfile; }
 
 const Education: React.FC<EducationProps> = ({ profile }) => {
-  // Use translations based on user's preferred language
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
 
   const articles = [
-    { title: "Understanding the 'Fourth Trimester'", category: "Mental Health", readTime: "5 min", summary: "The transition from pregnancy to motherhood requires a different kind of grace." },
-    { title: "C-Section Incision Care 101", category: "Physical Recovery", readTime: "8 min", summary: "Gentle techniques to ensure a smooth scar healing process." },
-    { title: "Nutrients for Iron Recovery", category: "Nutrition", readTime: "4 min", summary: "Traditional Indian superfoods to rebuild your vitality." },
+    { title: "Understanding the 'Fourth Trimester'", category: "Mental Health", readTime: "5 min", summary: "The transition from pregnancy to motherhood requires a different kind of clinical grace and internal patience." },
+    { title: "C-Section Incision Care 101", category: "Physical Recovery", readTime: "8 min", summary: "Gentle techniques to ensure a smooth scar healing process and identifying early warning signs of infection." },
+    { title: "Nutrients for Iron Recovery", category: "Nutrition", readTime: "4 min", summary: "Traditional Indian superfoods to rebuild your vitality after blood loss, optimized for modern lifestyles." },
+    { title: "Diastasis Recti Self-Check", category: "Physical Recovery", readTime: "6 min", summary: "A step-by-step clinical guide to assessing abdominal separation and safe restorative exercises." },
   ];
 
   const trustedPicks = [
@@ -41,7 +38,6 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
         <QuickLink icon={<ShieldCheck className="text-emerald-500" size={32} />} label={t.education.quickLinks.safety} />
       </div>
 
-      {/* Trusted Picks & Care Articles Newsletter Section */}
       <section className="space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-end gap-4">
            <div className="space-y-2">
@@ -50,17 +46,13 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
            </div>
            <button className="flex items-center gap-2 text-pink-500 font-black text-xs uppercase tracking-widest hover:underline transition-all">{t.education.archive} <ArrowRight size={14} /></button>
         </div>
-        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            {trustedPicks.map((pick, i) => (
              <div key={i} className="bg-white p-8 rounded-[3rem] border border-gray-50 shadow-md hover:shadow-2xl transition-all group flex flex-col justify-between">
                 <div className="space-y-4">
-                   <div className="flex justify-between items-start">
-                      <span className="text-[8px] font-black uppercase px-3 py-1 bg-pink-50 text-pink-500 rounded-full">{pick.tag}</span>
-                      <Star size={16} className="text-amber-300" fill="currentColor" />
-                   </div>
+                   <div className="flex justify-between items-start"><span className="text-[8px] font-black uppercase px-3 py-1 bg-pink-50 text-pink-500 rounded-full">{pick.tag}</span><Star size={16} className="text-amber-300" fill="currentColor" /></div>
                    <h4 className="text-lg font-black text-gray-900">{pick.brand}: {pick.product}</h4>
-                   <p className="text-xs text-slate-500 font-medium leading-relaxed italic">"Because {pick.reason.toLowerCase()} is essential for your baby’s delicate skin and your peace of mind."</p>
+                   <p className="text-xs text-slate-500 font-medium leading-relaxed italic">"Because {pick.reason.toLowerCase()} is essential for your peace of mind and delicate care."</p>
                 </div>
                 <button className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300 group-hover:text-pink-500 transition-colors">Learn More <ArrowRight size={12} /></button>
              </div>
@@ -73,23 +65,18 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
           <h2 className="text-2xl lg:text-3xl font-black text-gray-800">{t.education.govtTitle}</h2>
           <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest bg-gray-50 px-4 py-1.5 rounded-full shadow-inner">{t.education.govtSub}</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {GOVT_SCHEMES.map(scheme => (
-            <div key={scheme.title} className="bg-white p-8 rounded-[3rem] border border-gray-50 hover:border-blue-200 shadow-lg hover:shadow-2xl transition-all flex flex-col justify-between group">
-              <div className="space-y-5">
-                <div className="flex justify-between items-start">
-                  <div className="bg-blue-50 text-blue-500 p-4 rounded-2xl shadow-inner"><FileText size={28} /></div>
-                  <button className="p-3 bg-gray-50 text-slate-300 hover:text-blue-500 rounded-full transition-colors"><Video size={24} /></button>
-                </div>
-                <h3 className="text-2xl font-black text-gray-800 leading-tight">{scheme.title}</h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">{scheme.fullName}</p>
-                <div className="p-5 bg-blue-50/30 rounded-[1.5rem] border border-blue-50">
-                  <p className="text-sm font-black text-blue-700">{scheme.benefit}</p>
-                  <p className="text-[11px] text-blue-400 font-bold mt-2 italic">Eligibility: {scheme.eligibility}</p>
+            <div key={scheme.title} className="bg-white p-6 rounded-[2rem] border border-gray-50 hover:border-blue-200 shadow-lg hover:shadow-xl transition-all flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="bg-blue-50 text-blue-500 p-3 rounded-xl shadow-inner w-fit"><FileText size={20} /></div>
+                <h3 className="text-xl font-black text-gray-800 leading-tight">{scheme.title}</h3>
+                <div className="p-3 bg-blue-50/30 rounded-xl border border-blue-50">
+                  <p className="text-[10px] font-black text-blue-700">{scheme.benefit}</p>
                 </div>
               </div>
-              <button className="w-full mt-8 py-5 bg-slate-900 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-xl">
-                Apply Securely <ExternalLink size={16} />
+              <button className="w-full mt-6 py-3 bg-slate-900 text-white rounded-xl font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">
+                Details <ExternalLink size={12} />
               </button>
             </div>
           ))}
@@ -105,15 +92,9 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
                  <img src={`https://picsum.photos/seed/${idx + 10}/400/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Article" />
               </div>
               <div className="space-y-3 flex-1 py-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest bg-pink-50 px-3 py-1 rounded-full">{art.category}</span>
-                  <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">{art.readTime} {t.education.read}</span>
-                </div>
+                <div className="flex justify-between items-center"><span className="text-[10px] font-black text-pink-500 uppercase tracking-widest bg-pink-50 px-3 py-1 rounded-full">{art.category}</span><span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">{art.readTime} {t.education.read}</span></div>
                 <h3 className="text-xl lg:text-2xl font-black text-gray-900 group-hover:text-pink-600 transition-colors leading-snug">{art.title}</h3>
                 <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">{art.summary}</p>
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase text-pink-500 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Full Guide <ArrowRight size={12} />
-                </div>
               </div>
             </div>
           ))}

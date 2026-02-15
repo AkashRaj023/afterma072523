@@ -1,7 +1,8 @@
 
-export type DeliveryType = 'normal' | 'c-section';
+export type DeliveryType = 'normal' | 'c-section' | 'pending';
 export type ThemeAccent = 'PINK' | 'GREEN' | 'BLUE' | 'PURPLE' | 'YELLOW';
-export type RecoveryPhase = 'Month 1' | 'Month 2' | 'Month 3' | 'Month 4+';
+export type RecoveryPhase = 'Month 1' | 'Month 2' | 'Month 3' | 'Month 4+' | 'Trimester 1' | 'Trimester 2' | 'Trimester 3' | 'Pre-conception';
+export type MaternityStage = 'TTC' | 'Pregnant-T1' | 'Pregnant-T2' | 'Pregnant-T3' | 'Postpartum';
 export type RecoveryPace = 'gentle' | 'moderate';
 export type Language = 'english' | 'hindi';
 
@@ -55,7 +56,7 @@ export interface StoreItem {
   id: string;
   name: string;
   brand: string;
-  category: 'Baby Care' | 'Recovery' | 'Nutrition' | 'Devices';
+  category: 'Baby Care' | 'Recovery' | 'Nutrition' | 'Devices' | 'Maternity Care';
   price: number;
   image: string;
   description: string;
@@ -69,7 +70,7 @@ export interface CartItem extends StoreItem {
 export interface PeriodLog {
   id: string;
   date: string;
-  flow: 'Spotting' | 'Light' | 'Medium' | 'Heavy';
+  flow: 'Spotting' | 'Light' | 'Medium' | 'Heavy' | 'None';
   symptoms: string[];
   mood: string;
   notes: string;
@@ -80,6 +81,7 @@ export interface UserProfile {
   age: number;
   deliveryDate: string;
   deliveryType: DeliveryType;
+  maternityStage: MaternityStage;
   authenticated: boolean;
   role: 'mother' | 'caregiver';
   accent: ThemeAccent;
@@ -119,9 +121,9 @@ export interface RecoveryActivity {
   phase: RecoveryPhase;
   title: string;
   description: string;
-  category: 'Physical Recovery' | 'Emotional Stabilization' | 'Strength Building';
+  category: 'Physical Recovery' | 'Emotional Stabilization' | 'Strength Building' | 'Prenatal Care' | 'Birth Prep';
   duration: number; // minutes
-  frequency: string; // e.g., "3x week"
+  frequency: string; 
   points: number;
   typeSpecific?: DeliveryType; 
   intensityScale: number; // 1-10
