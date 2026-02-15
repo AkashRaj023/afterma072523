@@ -1,4 +1,3 @@
-
 export const translations: any = {
   english: {
     common: {
@@ -105,7 +104,10 @@ export const translations: any = {
         name: "Full Name",
         age: "Age",
         stage: "Maternity Stage",
-        delivery: "Delivery Method (If Postpartum)"
+        delivery: "Delivery Method (If Postpartum)",
+        medicalHistory: "Medical History",
+        allergies: "Allergies",
+        language: "Language Settings"
       },
       stages: {
         ttc: "Trying to Conceive",
@@ -113,6 +115,83 @@ export const translations: any = {
         t2: "Pregnant - Trimester 2",
         t3: "Pregnant - Trimester 3",
         post: "Postpartum Recovery"
+      },
+      languages: {
+        en: "English (GLOBAL)",
+        hi: "हिंदी (INDIA)"
+      }
+    }
+  },
+  hindi: {
+    common: {
+      signIn: "साइन इन करें",
+      signOut: "साइन आउट",
+      sos: "SOS के लिए दो बार टैप करें",
+      searchPlaceholder: "सुरक्षित खोज...",
+      welcome: "प्रणाम",
+      close: "बंद करें"
+    },
+    nav: {
+      dashboard: "डैशबोर्ड",
+      physical: "केयर जर्नी",
+      physicalPost: "हीलिंग जर्नी",
+      mental: "मानसिक स्वास्थ्य",
+      care: "केयर कनेक्ट",
+      momkart: "मॉमकार्ट",
+      education: "लर्निंग सेंटर",
+      settings: "सेटिंग्स",
+      membership: "आफ्टरमा प्लस"
+    },
+    dashboard: {
+      inspiration: "आज हम आपकी सुखद यात्रा की कामना करते हैं...",
+      streakSuffix: "स्वस्थ दिन",
+      progressSuffix: "हीलिंग पॉइंट्स",
+      logMoment: "पल लॉग करें",
+      nextStep: "सुरक्षित अगला कदम",
+      startSoftly: "सत्र शुरू करें",
+      healingPulse: "हीलिंग पल्स",
+      healingPulseSub: "पिछले 7 दिनों में आपकी रिकवरी का रुझान",
+      warmNutrition: "गर्म पोषण",
+      stats: {
+        hydration: "जलयोजन",
+        rest: "आराम",
+        selfcare: "स्वयं की देखभाल",
+        kegel: "जेंटल कोर"
+      }
+    },
+    physical: {
+      title: "केयर जर्नी",
+      titlePost: "हीलिंग जर्नी",
+      nurture: "नर्चर चरण",
+      transition: "बर्थ ट्रांजिशन",
+      healing: "हीलिंग चरण",
+      cycleTitle: "चक्र ट्रैकिंग",
+      cycleTitlePre: "लक्षण लॉग",
+      reportTitle: "स्वास्थ्य सारांश"
+    },
+    mental: {
+      subtitle: "अपनी भावनाओं को सुरक्षित रूप से साझा करें।",
+      ritualTitle: "दैनिक हीलिंग अनुष्ठान",
+      ritualReward: "अपना ख्याल रखने के लिए एक प्यारा सा हग!"
+    },
+    settings: {
+      tabs: {
+        profile: "मेरी प्रोफाइल",
+        journey: "यात्रा ट्यूनिंग",
+        custom: "दिखावट",
+        notifications: "सूचनाएं",
+        privacy: "गोपनीयता"
+      },
+      fields: {
+        name: "पूरा नाम",
+        age: "आयु",
+        medicalHistory: "चिकित्सा इतिहास",
+        allergies: "एलर्जी",
+        language: "भाषा सेटिंग्स"
+      },
+      languages: {
+        en: "English (GLOBAL)",
+        hi: "हिंदी (INDIA)"
       }
     }
   }

@@ -87,6 +87,7 @@ export interface UserProfile {
   accent: ThemeAccent;
   incognito: boolean;
   medicalHistory: string;
+  allergies: string;
   emergencyContact: string;
   membershipPlan: 'free' | 'plus';
   currentPhase: RecoveryPhase;

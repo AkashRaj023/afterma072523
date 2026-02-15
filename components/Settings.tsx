@@ -1,7 +1,11 @@
 
 import React, { useState, useRef } from 'react';
 import { UserProfile, ThemeAccent, Language, MaternityStage } from '../types';
-import { Save, User, Palette, Lock, Eye, Check, Camera, Upload, Bell, Activity, Users, Clipboard, Calendar, Heart, Clock, Zap, Shield, Globe, Monitor, ChevronRight, ToggleLeft, ToggleRight, CheckCircle2 } from 'lucide-react';
+import { 
+  User, Palette, Lock, Eye, Check, Bell, Activity, Users, 
+  Clock, Shield, Globe, Monitor, ChevronRight, ToggleLeft, 
+  ToggleRight, CheckCircle2, Heart, Clipboard, AlertCircle
+} from 'lucide-react';
 import { COLORS } from '../constants';
 import { translations } from '../translations';
 
@@ -14,7 +18,6 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
   const [activeTab, setActiveTab] = useState<'profile' | 'journey' | 'custom' | 'notifications' | 'privacy'>('profile');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [localCommitment, setLocalCommitment] = useState(15);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
@@ -23,11 +26,31 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
     setProfile(prev => ({ ...prev, ...fields }));
   };
 
+  const updateCaregiver = (fields: Partial<UserProfile['caregiver']>) => {
+    setProfile(prev => ({ ...prev, caregiver: { ...prev.caregiver, ...fields } }));
+  };
+
+  const updateCaregiverPermissions = (fields: Partial<UserProfile['caregiver']['permissions']>) => {
+    setProfile(prev => ({ 
+      ...prev, 
+      caregiver: { 
+        ...prev.caregiver, 
+        permissions: { ...prev.caregiver.permissions, ...fields } 
+      } 
+    }));
+  };
+
+  const updateNotifications = (fields: Partial<UserProfile['notifications']>) => {
+    setProfile(prev => ({ ...prev, notifications: { ...prev.notifications, ...fields } }));
+  };
+
   const currentTheme = COLORS[profile.accent] || COLORS.PINK;
 
   return (
     <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-10 lg:gap-16 animate-in pb-40 relative px-1 md:px-2">
       <div className={`theme-transition-overlay ${isTransitioning ? 'theme-transition-active' : ''}`} style={{ color: currentTheme.primary }} />
+      
+      {/* Sidebar Nav */}
       <div className="w-full md:w-64 space-y-1 shrink-0">
         <div className="px-5 mb-8">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Settings</h2>
@@ -42,22 +65,54 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
         </nav>
       </div>
 
+      {/* Main Content Area */}
       <div className="flex-1 bg-white rounded-[3rem] p-10 lg:p-12 shadow-[0_20px_80px_rgba(0,0,0,0.02)] border border-slate-100 flex flex-col transition-all">
         <div className="flex-1">
+          
+          {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-14 animate-in fade-in duration-500">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-10">
+               <div className="pb-8 border-b border-slate-50 space-y-1.5">
+                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Personal Data</h3>
+                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Essential information for personalized care logic.</p>
+               </div>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-10">
                 <Field label={t.settings.fields.name} value={profile.name} onChange={v => updateProfile({ name: v })} />
                 <Field label={t.settings.fields.age} type="number" value={profile.age.toString()} onChange={v => updateProfile({ age: parseInt(v) || 0 })} />
+                
+                <div className="col-span-full space-y-3">
+                   <label className="text-[9px] font-bold uppercase text-slate-400 tracking-[0.25em] ml-2 flex items-center gap-2">
+                     <Clipboard size={10} /> {t.settings.fields.medicalHistory}
+                   </label>
+                   <textarea 
+                    value={profile.medicalHistory} 
+                    onChange={e => updateProfile({ medicalHistory: e.target.value })} 
+                    placeholder="Enter relevant medical history (e.g., previous surgeries, chronic conditions)..."
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 transition-all shadow-inner text-sm focus:bg-white min-h-[120px] resize-none"
+                   />
+                </div>
+
+                <div className="col-span-full space-y-3">
+                   <label className="text-[9px] font-bold uppercase text-slate-400 tracking-[0.25em] ml-2 flex items-center gap-2 text-rose-400">
+                     <AlertCircle size={10} /> {t.settings.fields.allergies}
+                   </label>
+                   <textarea 
+                    value={profile.allergies || ""} 
+                    onChange={e => updateProfile({ allergies: e.target.value })} 
+                    placeholder="List any medication or food allergies..."
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 transition-all shadow-inner text-sm focus:bg-white min-h-[100px] resize-none border-rose-50"
+                   />
+                </div>
               </div>
             </div>
           )}
 
+          {/* Journey Tab */}
           {activeTab === 'journey' && (
             <div className="space-y-14 animate-in fade-in duration-500">
                <div className="pb-8 border-b border-slate-50 space-y-1.5">
                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">{t.settings.journey.title}</h3>
-                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Adapting AfterMa to your specific maternity stage.</p>
+                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Adapting AfterMa to your specific maternity phase.</p>
                </div>
                
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -107,103 +162,156 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile }) => {
             </div>
           )}
 
+          {/* Appearance Tab */}
           {activeTab === 'custom' && (
             <div className="space-y-12 animate-in fade-in duration-500">
                <div className="pb-8 border-b border-slate-50 space-y-1.5">
-                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Visual Appearance</h3>
-                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Choose a theme that feels right for your mood.</p>
+                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Appearance & Localization</h3>
+                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Customize your interface and language preference.</p>
                </div>
-               <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
-                  {Object.keys(COLORS).map(accent => (
-                    <button 
-                      key={accent} 
-                      onClick={() => {
-                        setIsTransitioning(true);
-                        updateProfile({ accent: accent as ThemeAccent });
-                        setTimeout(() => setIsTransitioning(false), 800);
-                      }}
-                      className={`group flex flex-col items-center gap-4 transition-all ${profile.accent === accent ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
-                    >
-                       <div className="w-16 h-16 rounded-[1.75rem] shadow-lg border-4 border-white transition-all group-hover:rotate-12" style={{ backgroundColor: (COLORS as any)[accent].primary }} />
-                       <span className="text-[9px] font-bold uppercase tracking-widest">{accent}</span>
-                    </button>
-                  ))}
+
+               <div className="space-y-4">
+                  <label className="text-[9px] font-bold uppercase text-slate-400 tracking-[0.25em] ml-2 flex items-center gap-2">
+                    <Globe size={12} /> {t.settings.fields.language}
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                     <button 
+                        onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, language: 'english' } })}
+                        className={`p-6 rounded-2xl border-2 transition-all font-bold text-sm text-center flex items-center justify-center gap-3 ${profile.journeySettings.language === 'english' ? 'bg-slate-900 border-slate-900 text-white shadow-xl' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'}`}
+                     >
+                        {t.settings.languages.en}
+                        {profile.journeySettings.language === 'english' && <Check size={16} />}
+                     </button>
+                     <button 
+                        onClick={() => updateProfile({ journeySettings: { ...profile.journeySettings, language: 'hindi' } })}
+                        className={`p-6 rounded-2xl border-2 transition-all font-bold text-sm text-center flex items-center justify-center gap-3 ${profile.journeySettings.language === 'hindi' ? 'bg-slate-900 border-slate-900 text-white shadow-xl' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'}`}
+                     >
+                        {t.settings.languages.hi}
+                        {profile.journeySettings.language === 'hindi' && <Check size={16} />}
+                     </button>
+                  </div>
+               </div>
+
+               <div className="space-y-8">
+                  <label className="text-[9px] font-bold uppercase text-slate-400 tracking-[0.25em] ml-2">Color Accents</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-6">
+                    {Object.keys(COLORS).map(accent => (
+                      <button 
+                        key={accent} 
+                        onClick={() => {
+                          setIsTransitioning(true);
+                          updateProfile({ accent: accent as ThemeAccent });
+                          setTimeout(() => setIsTransitioning(false), 800);
+                        }}
+                        className={`group flex flex-col items-center gap-4 transition-all ${profile.accent === accent ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
+                      >
+                        <div className="w-16 h-16 rounded-[1.75rem] shadow-lg border-4 border-white transition-all group-hover:rotate-12" style={{ backgroundColor: (COLORS as any)[accent].primary }} />
+                        <span className="text-[9px] font-bold uppercase tracking-widest">{accent}</span>
+                      </button>
+                    ))}
+                  </div>
                </div>
             </div>
           )}
 
+          {/* Notifications Tab */}
           {activeTab === 'notifications' && (
             <div className="space-y-10 animate-in fade-in duration-500">
                <div className="pb-8 border-b border-slate-50 space-y-1.5">
-                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Reminders & Alerts</h3>
-                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Stay on track with gentle, non-intrusive notifications.</p>
+                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Notification Management</h3>
+                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Fine-tune how and when we reach out to you.</p>
                </div>
                <div className="space-y-4">
                   <ToggleField 
                     label="Exercise Reminders" 
-                    sub="Gentle nudges for your physical sessions."
+                    sub="Nudges for scheduled physical therapy sessions."
                     active={profile.notifications.exerciseReminders} 
-                    onToggle={() => updateProfile({ notifications: {...profile.notifications, exerciseReminders: !profile.notifications.exerciseReminders} })} 
+                    onToggle={() => updateNotifications({ exerciseReminders: !profile.notifications.exerciseReminders })} 
                   />
                   <ToggleField 
                     label="Hydration Alerts" 
-                    sub="Reminders to stay mineralized throughout the day."
+                    sub="Timely reminders to keep mineral intake consistent."
                     active={profile.notifications.hydrationAlerts} 
-                    onToggle={() => updateProfile({ notifications: {...profile.notifications, hydrationAlerts: !profile.notifications.hydrationAlerts} })} 
+                    onToggle={() => updateNotifications({ hydrationAlerts: !profile.notifications.hydrationAlerts })} 
                   />
                   <ToggleField 
                     label="Mood Check-ins" 
-                    sub="Short reflections to anchor your day."
+                    sub="Short requests for reflection at key parts of the day."
                     active={profile.notifications.moodCheckins} 
-                    onToggle={() => updateProfile({ notifications: {...profile.notifications, moodCheckins: !profile.notifications.moodCheckins} })} 
+                    onToggle={() => updateNotifications({ moodCheckins: !profile.notifications.moodCheckins })} 
+                  />
+                  <ToggleField 
+                    label="Care Connect Updates" 
+                    sub="Alerts about sister circle activities and expert responses."
+                    active={profile.notifications.careConnectUpdates} 
+                    onToggle={() => updateNotifications({ careConnectUpdates: !profile.notifications.careConnectUpdates })} 
+                  />
+                  <ToggleField 
+                    label="SOS Confirmations" 
+                    sub="Confirmations when SOS signals are initiated or resolved."
+                    active={profile.notifications.sosConfirmations} 
+                    onToggle={() => updateNotifications({ sosConfirmations: !profile.notifications.sosConfirmations })} 
                   />
                </div>
             </div>
           )}
 
+          {/* Privacy Tab */}
           {activeTab === 'privacy' && (
             <div className="space-y-12 animate-in fade-in duration-500">
                <div className="pb-8 border-b border-slate-50 space-y-1.5">
-                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Privacy & Caregiver</h3>
-                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Control who sees your data and manage your circle of trust.</p>
+                 <h3 className="text-2xl font-bold text-slate-900 tracking-tight capitalize">Security & Circle of Trust</h3>
+                 <p className="text-sm font-medium text-slate-400 opacity-80 leading-relaxed italic">Manage access for your designated caregiver and emergency settings.</p>
                </div>
                
                <div className="space-y-8">
-                  <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 space-y-8">
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                           <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-50 text-slate-400"><Users size={20} /></div>
-                           <h4 className="text-lg font-bold text-slate-900 tracking-tight">Trusted Caregiver</h4>
-                        </div>
-                        <button className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">Edit Partner</button>
+                  <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 space-y-10">
+                     <div className="flex items-center gap-4">
+                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-50 text-slate-400"><Users size={20} /></div>
+                        <h4 className="text-lg font-bold text-slate-900 tracking-tight">Designated Caregiver Profile</h4>
                      </div>
-                     <div className="grid gap-4">
-                        <PermissionItem 
-                           label="View Wellness Logs" 
-                           active={profile.caregiver.permissions.canViewMood} 
-                           onToggle={() => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewMood: !profile.caregiver.permissions.canViewMood}} })} 
-                        />
-                        <PermissionItem 
-                           label="View Physical Progress" 
-                           active={profile.caregiver.permissions.canViewPhysical} 
-                           onToggle={() => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewPhysical: !profile.caregiver.permissions.canViewPhysical}} })} 
-                        />
-                        <PermissionItem 
-                           label="Access Appointments" 
-                           active={profile.caregiver.permissions.canViewAppointments} 
-                           onToggle={() => updateProfile({ caregiver: {...profile.caregiver, permissions: {...profile.caregiver.permissions, canViewAppointments: !profile.caregiver.permissions.canViewAppointments}} })} 
-                        />
+                     
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <Field label="Caregiver Name" value={profile.caregiver.name} onChange={v => updateCaregiver({ name: v })} />
+                        <Field label="Relationship" value={profile.caregiver.relationship} onChange={v => updateCaregiver({ relationship: v })} />
+                        <Field label="Emergency Contact Number" value={profile.caregiver.contact} onChange={v => updateCaregiver({ contact: v })} />
+                     </div>
+
+                     <div className="space-y-4">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-1">Permissions & Shared Access</p>
+                        <div className="grid gap-3">
+                           <PermissionItem 
+                              label="Allow Mood Log Access" 
+                              active={profile.caregiver.permissions.canViewMood} 
+                              onToggle={() => updateCaregiverPermissions({ canViewMood: !profile.caregiver.permissions.canViewMood })} 
+                           />
+                           <PermissionItem 
+                              label="Allow Physical Recovery Viewing" 
+                              active={profile.caregiver.permissions.canViewPhysical} 
+                              onToggle={() => updateCaregiverPermissions({ canViewPhysical: !profile.caregiver.permissions.canViewPhysical })} 
+                           />
+                           <PermissionItem 
+                              label="Share Detailed Medical History" 
+                              active={profile.caregiver.permissions.canViewMedicalHistory} 
+                              onToggle={() => updateCaregiverPermissions({ canViewMedicalHistory: !profile.caregiver.permissions.canViewMedicalHistory })} 
+                           />
+                           <PermissionItem 
+                              label="Allow Appointment Syncing" 
+                              active={profile.caregiver.permissions.canViewAppointments} 
+                              onToggle={() => updateCaregiverPermissions({ canViewAppointments: !profile.caregiver.permissions.canViewAppointments })} 
+                           />
+                        </div>
                      </div>
                   </div>
                   
                   <div className="flex items-center gap-6 p-8 bg-slate-900 rounded-[2.5rem] text-white overflow-hidden relative group">
                      <div className="relative z-10 space-y-1 flex-1">
-                        <h4 className="text-lg font-bold tracking-tight">Incognito (Ghost) Mode</h4>
-                        <p className="text-xs text-slate-400 italic">Logs will not be shown on summaries while active.</p>
+                        <h4 className="text-lg font-bold tracking-tight">Ghost (Incognito) Mode</h4>
+                        <p className="text-xs text-slate-400 italic">Sessions logged in ghost mode won't show in shared dashboards.</p>
                      </div>
                      <button 
                        onClick={() => updateProfile({ incognito: !profile.incognito })}
-                       className={`relative z-10 p-2.5 rounded-2xl transition-all ${profile.incognito ? 'bg-purple-500 text-white shadow-lg' : 'bg-white/10 text-white/40'}`}
+                       className={`relative z-10 p-3 rounded-2xl transition-all ${profile.incognito ? 'bg-rose-500 text-white shadow-lg' : 'bg-white/10 text-white/40'}`}
                      >
                         <Eye size={24} />
                      </button>
