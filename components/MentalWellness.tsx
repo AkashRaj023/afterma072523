@@ -4,7 +4,7 @@ import {
   Brain, Heart, Edit3, Sparkles, MessageCircle, AlertTriangle, Phone, ShieldCheck, 
   CheckSquare, Music, Star, ChevronRight, Activity, Zap, Moon, X, Stethoscope, 
   Search, Shield, Gift, Smile, Send, Image as ImageIcon, Paperclip, Bot, User, Mic,
-  Play, Film, Headphones, Volume2
+  Play, Film, Headphones, Volume2, Pause, SkipForward, SkipBack, Maximize2
 } from 'lucide-react';
 import { EPDS_QUESTIONS, HELPLINES, STABILIZATION_TASKS, COLORS } from '../constants';
 import { UserProfile, ChatMessage } from '../types';
@@ -26,6 +26,8 @@ const MentalWellness: React.FC<MentalProps> = ({ profile, messages, setMessages,
   const [answers, setAnswers] = useState<number[]>([]);
   const [showTriage, setShowTriage] = useState(false);
   const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [playingMedia, setPlayingMedia] = useState<any>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -261,71 +263,140 @@ const MentalWellness: React.FC<MentalProps> = ({ profile, messages, setMessages,
                
                 <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-20">
                    <div className="space-y-8">
-                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl shadow-inner"><Headphones size={24} /></div>
-                        <div className="space-y-0.5">
-                          <h4 className="text-2xl font-black text-slate-900 tracking-tight">Audio Sanctuaries</h4>
-                          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Healing Frequencies</p>
-                        </div>
-                     </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[
-                          { title: "Ocean Breath", duration: "12m", mood: "Calm", img: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&q=80&w=400" },
-                          { title: "Forest Whisper", duration: "15m", mood: "Grounded", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=400" },
-                          { title: "Morning Dew", duration: "8m", mood: "Fresh", img: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=400" }
-                        ].map((item, i) => (
-                          <div key={i} className="group cursor-pointer space-y-4">
-                             <div className="aspect-video rounded-[2rem] overflow-hidden relative shadow-lg">
-                                <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                                <div className="absolute bottom-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-bold uppercase tracking-widest text-slate-900">{item.duration}</div>
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Play size={48} className="text-white drop-shadow-2xl" /></div>
-                             </div>
-                             <div className="flex justify-between items-center px-2">
-                                <div>
-                                  <h5 className="font-bold text-slate-900">{item.title}</h5>
-                                  <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">{item.mood}</p>
-                                </div>
-                                <button className="p-2 bg-slate-50 rounded-full text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all"><ChevronRight size={16} /></button>
-                             </div>
-                          </div>
-                        ))}
-                     </div>
-                   </div>
+                      <div className="flex items-center gap-4">
+                         <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl shadow-inner"><Headphones size={24} /></div>
+                         <div className="space-y-0.5">
+                           <h4 className="text-2xl font-black text-slate-900 tracking-tight">Audio Sanctuaries</h4>
+                           <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Healing Frequencies</p>
+                         </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                         {[
+                           { type: 'audio', title: "Ocean Breath", duration: "12m", mood: "Calm", img: "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&q=80&w=400" },
+                           { type: 'audio', title: "Forest Whisper", duration: "15m", mood: "Grounded", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=400" },
+                           { type: 'audio', title: "Morning Dew", duration: "8m", mood: "Fresh", img: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&q=80&w=400" }
+                         ].map((item, i) => (
+                           <div key={i} onClick={() => { setPlayingMedia(item); setIsPlaying(true); }} className="group cursor-pointer bg-white p-6 rounded-[2.5rem] border border-slate-100 hover:shadow-xl transition-all space-y-4">
+                              <div className="aspect-square rounded-[2rem] overflow-hidden relative shadow-inner bg-slate-50 flex items-center justify-center">
+                                 <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80" />
+                                 <div className="absolute inset-0 bg-amber-500/10 group-hover:bg-amber-500/5 transition-colors" />
+                                 <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-16 h-16 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                                       <Headphones size={24} className="text-amber-600" />
+                                    </div>
+                                 </div>
+                              </div>
+                              <div className="flex justify-between items-center px-2">
+                                 <div>
+                                   <h5 className="font-bold text-slate-900">{item.title}</h5>
+                                   <p className="text-[10px] text-amber-500 font-bold uppercase tracking-widest">{item.mood} • {item.duration}</p>
+                                 </div>
+                                 <button className="p-3 bg-amber-50 text-amber-600 rounded-2xl group-hover:bg-amber-600 group-hover:text-white transition-all"><Play size={16} fill="currentColor" /></button>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                    </div>
 
-                   <div className="space-y-8">
-                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-inner"><Film size={24} /></div>
-                        <div className="space-y-0.5">
-                          <h4 className="text-2xl font-black text-slate-900 tracking-tight">Cinematic Comfort</h4>
-                          <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Visual Grounding</p>
-                        </div>
-                     </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[
-                          { title: "Nature's Rhythm", duration: "45m", mood: "Peaceful", img: "https://images.unsplash.com/photo-1501854140801-50d01674aa3e?auto=format&fit=crop&q=80&w=400" },
-                          { title: "Starlit Journey", duration: "60m", mood: "Dreamy", img: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=400" },
-                          { title: "Mountain Echo", duration: "30m", mood: "Majestic", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=400" }
-                        ].map((item, i) => (
-                          <div key={i} className="group cursor-pointer space-y-4">
-                             <div className="aspect-[16/9] rounded-[2rem] overflow-hidden relative shadow-lg">
-                                <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                                <div className="absolute top-4 left-4 px-3 py-1 bg-indigo-500/80 backdrop-blur-md rounded-full text-[8px] font-bold uppercase tracking-widest text-white">Movie</div>
-                                <div className="absolute bottom-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-bold uppercase tracking-widest text-slate-900">{item.duration}</div>
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Play size={48} className="text-white drop-shadow-2xl" /></div>
-                             </div>
-                             <div className="flex justify-between items-center px-2">
-                                <div>
-                                  <h5 className="font-bold text-slate-900">{item.title}</h5>
-                                  <p className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest">{item.mood}</p>
+                    <div className="space-y-8">
+                      <div className="flex items-center gap-4">
+                         <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-inner"><Film size={24} /></div>
+                         <div className="space-y-0.5">
+                           <h4 className="text-2xl font-black text-slate-900 tracking-tight">Cinematic Comfort</h4>
+                           <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">Visual Grounding</p>
+                         </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                         {[
+                           { type: 'movie', title: "Nature's Rhythm", duration: "45m", mood: "Peaceful", img: "https://images.unsplash.com/photo-1501854140801-50d01674aa3e?auto=format&fit=crop&q=80&w=400" },
+                           { type: 'movie', title: "Starlit Journey", duration: "60m", mood: "Dreamy", img: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=400" },
+                           { type: 'movie', title: "Mountain Echo", duration: "30m", mood: "Majestic", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=400" }
+                         ].map((item, i) => (
+                           <div key={i} onClick={() => { setPlayingMedia(item); setIsPlaying(true); }} className="group cursor-pointer space-y-4">
+                              <div className="aspect-[16/9] rounded-[2.5rem] overflow-hidden relative shadow-2xl border-4 border-white">
+                                 <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                                 <div className="absolute top-4 left-4 px-3 py-1 bg-indigo-500/90 backdrop-blur-md rounded-full text-[8px] font-bold uppercase tracking-widest text-white border border-white/20">Movie</div>
+                                 <div className="absolute bottom-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-bold uppercase tracking-widest text-slate-900">{item.duration}</div>
+                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/30">
+                                       <Play size={40} className="text-white fill-white" />
+                                    </div>
+                                 </div>
+                              </div>
+                              <div className="flex justify-between items-center px-4">
+                                 <div>
+                                   <h5 className="font-bold text-slate-900 text-lg">{item.title}</h5>
+                                   <p className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest">{item.mood}</p>
+                                 </div>
+                                 <div className="flex gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-200" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-200" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                 </div>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                    </div>
+
+                    {/* Media Player Overlay */}
+                    {playingMedia && (
+                       <div className="fixed inset-0 z-[160] bg-slate-950 flex flex-col items-center justify-center animate-in fade-in duration-500">
+                          <button onClick={() => setPlayingMedia(null)} className="absolute top-10 right-10 p-4 text-white/40 hover:text-white transition-colors"><X size={32} /></button>
+                          
+                          <div className="max-w-4xl w-full px-8 space-y-12">
+                             <div className={`aspect-video rounded-[3rem] overflow-hidden relative shadow-2xl border border-white/10 ${playingMedia.type === 'audio' ? 'bg-gradient-to-br from-amber-900/40 to-slate-900' : ''}`}>
+                                {playingMedia.type === 'movie' ? (
+                                   <img src={playingMedia.img} alt={playingMedia.title} className="w-full h-full object-cover opacity-60" />
+                                ) : (
+                                   <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="relative">
+                                         <div className="w-64 h-64 bg-amber-500/20 rounded-full animate-ping absolute inset-0" />
+                                         <div className="w-64 h-64 bg-amber-500/30 rounded-full animate-pulse relative flex items-center justify-center">
+                                            <Headphones size={80} className="text-amber-400" />
+                                         </div>
+                                      </div>
+                                   </div>
+                                )}
+                                <div className="absolute bottom-10 left-10 right-10 space-y-6">
+                                   <div className="space-y-2">
+                                      <span className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.3em]">{playingMedia.type === 'audio' ? 'Now Listening' : 'Now Watching'}</span>
+                                      <h3 className="text-4xl font-black text-white tracking-tight">{playingMedia.title}</h3>
+                                   </div>
+                                   <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                      <div className="h-full bg-amber-500 rounded-full w-1/3 animate-pulse" />
+                                   </div>
+                                   <div className="flex justify-between text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                                      <span>04:12</span>
+                                      <span>{playingMedia.duration}</span>
+                                   </div>
                                 </div>
-                                <button className="p-2 bg-slate-50 rounded-full text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all"><ChevronRight size={16} /></button>
+                             </div>
+
+                             <div className="flex flex-col items-center gap-10">
+                                <div className="flex items-center gap-12">
+                                   <button className="p-4 text-white/40 hover:text-white transition-all hover:scale-110"><SkipBack size={32} /></button>
+                                   <button 
+                                      onClick={() => setIsPlaying(!isPlaying)}
+                                      className="w-24 h-24 bg-white text-slate-950 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                                   >
+                                      {isPlaying ? <Pause size={40} fill="currentColor" /> : <Play size={40} fill="currentColor" className="ml-2" />}
+                                   </button>
+                                   <button className="p-4 text-white/40 hover:text-white transition-all hover:scale-110"><SkipForward size={32} /></button>
+                                </div>
+
+                                <div className="flex items-center gap-8 text-white/40">
+                                   <button className="hover:text-white transition-colors"><Volume2 size={24} /></button>
+                                   <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+                                      <div className="h-full bg-white/60 w-3/4" />
+                                   </div>
+                                   <button className="hover:text-white transition-colors"><Maximize2 size={24} /></button>
+                                </div>
                              </div>
                           </div>
-                        ))}
-                     </div>
-                   </div>
+                       </div>
+                    )}
 
                   <div className="p-10 bg-slate-900 rounded-[3rem] text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
                      <div className="relative z-10 space-y-4 max-w-md">

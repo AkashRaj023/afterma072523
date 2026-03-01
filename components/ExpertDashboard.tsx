@@ -5,7 +5,8 @@ import {
   Calendar, MessageCircle, Users, Activity, 
   Clock, ShieldCheck, ChevronRight, Search, 
   Video, FileText, Bell, Star, TrendingUp, 
-  CheckCircle2, AlertCircle, MoreHorizontal, Shield, Bot, HelpCircle
+  CheckCircle2, AlertCircle, MoreHorizontal, Shield, Bot, HelpCircle,
+  Mic, MicOff, VideoOff, PhoneOff, Settings as SettingsIcon, Share, Hand, MessageSquare, X
 } from 'lucide-react';
 import { COLORS } from '../constants';
 
@@ -16,6 +17,9 @@ interface ExpertDashboardProps {
 const ExpertDashboard: React.FC<ExpertDashboardProps> = ({ profile }) => {
   const theme = COLORS[profile.accent] || COLORS.PINK;
   const [activeTab, setActiveTab] = useState<'sessions' | 'queries' | 'rooms' | 'members' | 'logs'>('sessions');
+  const [showMeeting, setShowMeeting] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isCamOff, setIsCamOff] = useState(false);
 
   const stats = [
     { label: 'Active Sessions', value: '12', icon: <Calendar size={18} />, color: 'blue' },
@@ -44,7 +48,10 @@ const ExpertDashboard: React.FC<ExpertDashboardProps> = ({ profile }) => {
               <Bell size={20} />
               <div className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
            </button>
-           <button className="px-6 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
+           <button 
+              onClick={() => setShowMeeting(true)}
+              className="px-6 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2"
+            >
               <Video size={18} />
               <span>Start Live Room</span>
            </button>
@@ -52,22 +59,131 @@ const ExpertDashboard: React.FC<ExpertDashboardProps> = ({ profile }) => {
       </header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map(stat => (
-          <div key={stat.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-md transition-all space-y-4">
-            <div className={`w-12 h-12 rounded-2xl bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
-              {stat.icon}
+      {!showMeeting && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map(stat => (
+            <div key={stat.label} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-sm hover:shadow-md transition-all space-y-4">
+              <div className={`w-12 h-12 rounded-2xl bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
+                {stat.icon}
+              </div>
+              <div className="space-y-1">
+                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                 <p className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</p>
+              </div>
             </div>
-            <div className="space-y-1">
-               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-               <p className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* Meeting Room Overlay */}
+      {showMeeting && (
+        <div className="fixed inset-0 z-[200] bg-slate-950 flex flex-col animate-in fade-in duration-500">
+           {/* Meeting Header */}
+           <div className="h-16 border-b border-white/10 flex items-center justify-between px-8 shrink-0">
+              <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Live Room Active</span>
+                 </div>
+                 <span className="text-white/40 text-xs font-medium">|</span>
+                 <span className="text-white/60 text-xs font-bold tracking-tight">Postpartum Support Group • 12 Participants</span>
+              </div>
+              <div className="flex items-center gap-4">
+                 <div className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Room ID: AM-772-B9</div>
+                 <button onClick={() => setShowMeeting(false)} className="p-2 text-white/40 hover:text-white transition-colors"><X size={20} /></button>
+              </div>
+           </div>
+
+           {/* Participant Grid */}
+           <div className="flex-1 p-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto scrollbar-hide">
+              {/* Expert Tile (Self) */}
+              <div className="relative aspect-video bg-slate-900 rounded-3xl overflow-hidden border-2 border-emerald-500 shadow-2xl group">
+                 {!isCamOff ? (
+                    <img src="https://images.unsplash.com/photo-1559839734-2b71f1536783?auto=format&fit=crop&q=80&w=800" alt="Expert" className="w-full h-full object-cover opacity-80" />
+                 ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+                       <div className="w-24 h-24 bg-slate-700 rounded-full flex items-center justify-center text-4xl font-black text-white shadow-inner">AI</div>
+                    </div>
+                 )}
+                 <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-xl border border-white/10">
+                    <span className="text-[10px] font-bold text-white uppercase tracking-widest">You (Expert)</span>
+                    {isMuted && <MicOff size={12} className="text-rose-500" />}
+                 </div>
+                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="p-2 bg-black/40 backdrop-blur-md rounded-lg text-white/60 hover:text-white"><SettingsIcon size={16} /></button>
+                 </div>
+              </div>
+
+              {/* Other Participants */}
+              {[
+                { name: "Anjali S.", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400" },
+                { name: "Priya P.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=400" },
+                { name: "Meera G.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400" },
+                { name: "Sonia K.", img: "https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&q=80&w=400" },
+                { name: "Ritu M.", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400" },
+                { name: "Kavita R.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400" },
+                { name: "Neha S.", img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=400" }
+              ].map((p, i) => (
+                <div key={i} className="relative aspect-video bg-slate-900 rounded-3xl overflow-hidden border border-white/5 group hover:border-white/20 transition-all">
+                   <img src={p.img} alt={p.name} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+                   <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/40 backdrop-blur-md rounded-xl border border-white/10">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-widest">{p.name}</span>
+                   </div>
+                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="p-2 bg-black/40 backdrop-blur-md rounded-lg text-white/60 hover:text-white"><Star size={14} /></button>
+                      <button className="p-2 bg-black/40 backdrop-blur-md rounded-lg text-white/60 hover:text-white"><MoreHorizontal size={14} /></button>
+                   </div>
+                </div>
+              ))}
+           </div>
+
+           {/* Meeting Controls */}
+           <div className="h-24 bg-slate-900/50 backdrop-blur-xl border-t border-white/10 flex items-center justify-between px-12 shrink-0">
+              <div className="flex items-center gap-6">
+                 <div className="text-white/80 font-bold text-sm tracking-tight">10:42 AM</div>
+                 <div className="h-4 w-px bg-white/10" />
+                 <div className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Clinical Session</div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                 <button 
+                    onClick={() => setIsMuted(!isMuted)}
+                    className={`p-5 rounded-2xl transition-all ${isMuted ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
+                 >
+                    {isMuted ? <MicOff size={24} /> : <Mic size={24} />}
+                 </button>
+                 <button 
+                    onClick={() => setIsCamOff(!isCamOff)}
+                    className={`p-5 rounded-2xl transition-all ${isCamOff ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
+                 >
+                    {isCamOff ? <VideoOff size={24} /> : <Video size={24} />}
+                 </button>
+                 <button className="p-5 bg-slate-800 text-white rounded-2xl hover:bg-slate-700 transition-all"><Hand size={24} /></button>
+                 <button className="p-5 bg-slate-800 text-white rounded-2xl hover:bg-slate-700 transition-all"><Share size={24} /></button>
+                 <button 
+                    onClick={() => setShowMeeting(false)}
+                    className="px-8 py-5 bg-rose-500 text-white rounded-2xl font-bold text-sm flex items-center gap-3 hover:bg-rose-600 transition-all shadow-xl shadow-rose-500/20"
+                 >
+                    <PhoneOff size={20} />
+                    <span>End Session</span>
+                 </button>
+              </div>
+
+              <div className="flex items-center gap-4">
+                 <button className="p-4 text-white/40 hover:text-white transition-colors relative">
+                    <MessageSquare size={20} />
+                    <div className="absolute top-3 right-3 w-2 h-2 bg-emerald-500 rounded-full border-2 border-slate-900" />
+                 </button>
+                 <button className="p-4 text-white/40 hover:text-white transition-colors"><Users size={20} /></button>
+                 <button className="p-4 text-white/40 hover:text-white transition-colors"><Shield size={20} /></button>
+              </div>
+           </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      {!showMeeting && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         {/* Sidebar Navigation */}
         <div className="lg:col-span-3 space-y-2">
@@ -208,8 +324,9 @@ const ExpertDashboard: React.FC<ExpertDashboardProps> = ({ profile }) => {
           )}
         </div>
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 };
 
 const DashNavBtn = ({ active, onClick, icon, label }: any) => (

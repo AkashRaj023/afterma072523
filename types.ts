@@ -105,6 +105,13 @@ export interface ExerciseLog {
   completed: boolean;
 }
 
+export interface JournalEntry {
+  id: string;
+  prompt: string;
+  content: string;
+  timestamp: number;
+}
+
 export interface UserProfile {
   name: string;
   age: number;
@@ -129,6 +136,7 @@ export interface UserProfile {
   journeySettings: JourneySettings;
   notifications: NotificationSettings;
   periodLogs: PeriodLog[];
+  journalEntries?: JournalEntry[];
   profilePicture?: string;
   verification?: VerificationData;
 }

@@ -330,7 +330,7 @@ const App: React.FC = () => {
       </main>
       {showSOS && <SOSOverlay profile={profile} onClose={() => setShowSOS(false)} />}
       {showLogModal && <HealthLogModal profile={profile} onClose={() => setShowLogModal(false)} onSave={handleSaveLog} />}
-      {showJournal && <Journal profile={profile} onClose={() => setShowJournal(false)} />}
+      {showJournal && <Journal profile={profile} setProfile={setProfile} onClose={() => setShowJournal(false)} />}
     </div>
   );
 };

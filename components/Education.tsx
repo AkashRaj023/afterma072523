@@ -63,10 +63,34 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <QuickLink icon={<Book className="text-pink-500" size={32} />} label={t.education.quickLinks.guides} onClick={() => setActiveSection('guides')} />
-        <QuickLink icon={<PlayCircle className="text-blue-500" size={32} />} label={t.education.quickLinks.videos} onClick={() => setActiveSection('videos')} />
-        <QuickLink icon={<HeartPulse className="text-red-500" size={32} />} label={t.education.quickLinks.tips} onClick={() => setActiveSection('tips')} />
-        <QuickLink icon={<ShieldCheck className="text-emerald-500" size={32} />} label={t.education.quickLinks.safety} onClick={() => setActiveSection('safety')} />
+        <QuickLink 
+          icon={<Book size={32} />} 
+          label={t.education.quickLinks.guides} 
+          onClick={() => setActiveSection('guides')} 
+          active={activeSection === 'guides'}
+          color="pink"
+        />
+        <QuickLink 
+          icon={<PlayCircle size={32} />} 
+          label={t.education.quickLinks.videos} 
+          onClick={() => setActiveSection('videos')} 
+          active={activeSection === 'videos'}
+          color="blue"
+        />
+        <QuickLink 
+          icon={<HeartPulse size={32} />} 
+          label={t.education.quickLinks.tips} 
+          onClick={() => setActiveSection('tips')} 
+          active={activeSection === 'tips'}
+          color="rose"
+        />
+        <QuickLink 
+          icon={<ShieldCheck size={32} />} 
+          label={t.education.quickLinks.safety} 
+          onClick={() => setActiveSection('safety')} 
+          active={activeSection === 'safety'}
+          color="emerald"
+        />
       </div>
 
       <section className="space-y-12">
@@ -153,7 +177,12 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
         <div className="fixed inset-0 z-[160] bg-white/98 backdrop-blur-3xl flex flex-col animate-in slide-in-from-bottom duration-700">
            <div className="h-20 border-b border-slate-100 flex items-center justify-between px-8 lg:px-12 shrink-0">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-pink-50 text-pink-600 rounded-xl">
+                <div className={`p-2.5 rounded-xl ${
+                  activeSection === 'guides' ? 'bg-pink-50 text-pink-600' :
+                  activeSection === 'videos' ? 'bg-blue-50 text-blue-600' :
+                  activeSection === 'tips' ? 'bg-rose-50 text-rose-600' :
+                  'bg-emerald-50 text-emerald-600'
+                }`}>
                    {activeSection === 'guides' && <Book size={20} />}
                    {activeSection === 'videos' && <PlayCircle size={20} />}
                    {activeSection === 'tips' && <HeartPulse size={20} />}
@@ -161,29 +190,55 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 leading-none capitalize">{activeSection} Portal</h3>
-                  <p className="text-[10px] font-bold text-pink-500 uppercase tracking-widest mt-1">Curated Expert Resources</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${
+                    activeSection === 'guides' ? 'text-pink-500' :
+                    activeSection === 'videos' ? 'text-blue-500' :
+                    activeSection === 'tips' ? 'text-rose-500' :
+                    'text-emerald-500'
+                  }`}>Curated Expert Resources</p>
                 </div>
               </div>
               <button onClick={() => setActiveSection(null)} className="p-2 text-slate-300 hover:text-slate-900 transition-colors"><X size={24} /></button>
            </div>
            
-           <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-12">
+           <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-12 bg-slate-50/30">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                  {Array.from({length: 6}).map((_, i) => (
-                   <div key={i} className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group cursor-pointer space-y-6">
-                      <div className="aspect-video bg-slate-100 rounded-[2rem] overflow-hidden relative">
+                   <div key={i} className={`bg-white p-8 rounded-[3rem] border shadow-sm hover:shadow-xl transition-all group cursor-pointer space-y-6 ${
+                     activeSection === 'guides' ? 'hover:border-pink-200' :
+                     activeSection === 'videos' ? 'hover:border-blue-200' :
+                     activeSection === 'tips' ? 'hover:border-rose-200' :
+                     'hover:border-emerald-200'
+                   }`}>
+                      <div className="aspect-video bg-slate-100 rounded-[2rem] overflow-hidden relative border border-slate-100">
                          <img src={`https://picsum.photos/seed/${activeSection}-${i}/600/400`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Resource" />
-                         {activeSection === 'videos' && <div className="absolute inset-0 flex items-center justify-center bg-black/20"><PlayCircle size={48} className="text-white drop-shadow-2xl" /></div>}
+                         {activeSection === 'videos' && (
+                           <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+                             <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+                               <PlayCircle size={40} className="text-white fill-white/20" />
+                             </div>
+                           </div>
+                         )}
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                          <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-pink-500 uppercase tracking-widest">Expert Verified</span>
-                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{i + 2}m read</span>
+                            <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                              activeSection === 'guides' ? 'bg-pink-50 text-pink-600' :
+                              activeSection === 'videos' ? 'bg-blue-50 text-blue-600' :
+                              activeSection === 'tips' ? 'bg-rose-50 text-rose-600' :
+                              'bg-emerald-50 text-emerald-600'
+                            }`}>Expert Verified</span>
+                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">{i + 2}m {activeSection === 'videos' ? 'watch' : 'read'}</span>
                          </div>
-                         <h4 className="text-xl font-bold text-slate-900 leading-tight">Essential {activeSection === 'guides' ? 'Guide to' : activeSection === 'tips' ? 'Tips for' : 'Safety in'} Postpartum Care Vol. {i + 1}</h4>
-                         <p className="text-xs text-slate-400 font-medium leading-relaxed italic">"A comprehensive clinical overview of recovery milestones and emotional stabilization techniques."</p>
+                         <h4 className="text-xl font-black text-slate-900 leading-tight">Essential {activeSection === 'guides' ? 'Guide to' : activeSection === 'tips' ? 'Tips for' : 'Safety in'} Postpartum Care Vol. {i + 1}</h4>
+                         <p className="text-xs text-slate-500 font-medium leading-relaxed italic line-clamp-2">"A comprehensive clinical overview of recovery milestones and emotional stabilization techniques."</p>
                       </div>
-                      <button className="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest group-hover:bg-slate-900 group-hover:text-white transition-all flex items-center justify-center gap-2">
+                      <button className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                        activeSection === 'guides' ? 'bg-pink-50 text-pink-600 group-hover:bg-pink-600 group-hover:text-white' :
+                        activeSection === 'videos' ? 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white' :
+                        activeSection === 'tips' ? 'bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white' :
+                        'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                      }`}>
                          Open Resource <ChevronRight size={14} />
                       </button>
                    </div>
@@ -196,11 +251,25 @@ const Education: React.FC<EducationProps> = ({ profile }) => {
   );
 };
 
-const QuickLink = ({ icon, label, onClick }: any) => (
-  <div onClick={onClick} className="bg-white p-6 lg:p-8 rounded-[2.5rem] text-center shadow-md border border-gray-50 hover:border-pink-200 hover:shadow-xl transition-all cursor-pointer group">
-    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">{icon}</div>
-    <span className="font-black text-xs lg:text-sm text-gray-800 uppercase tracking-wider">{label}</span>
-  </div>
-);
+const QuickLink = ({ icon, label, onClick, active, color }: any) => {
+  const colorClasses: Record<string, string> = {
+    pink: 'text-pink-500 bg-pink-50 border-pink-100 hover:border-pink-300',
+    blue: 'text-blue-500 bg-blue-50 border-blue-100 hover:border-blue-300',
+    rose: 'text-rose-500 bg-rose-50 border-rose-100 hover:border-rose-300',
+    emerald: 'text-emerald-500 bg-emerald-50 border-emerald-100 hover:border-emerald-300',
+  };
+
+  return (
+    <div 
+      onClick={onClick} 
+      className={`p-6 lg:p-8 rounded-[2.5rem] text-center shadow-md border transition-all cursor-pointer group flex flex-col items-center justify-center gap-4 ${
+        active ? 'ring-4 ring-slate-100 scale-105' : ''
+      } ${colorClasses[color] || 'bg-white border-gray-50'}`}
+    >
+      <div className="group-hover:scale-110 transition-transform">{icon}</div>
+      <span className="font-black text-[10px] lg:text-xs uppercase tracking-widest">{label}</span>
+    </div>
+  );
+};
 
 export default Education;
