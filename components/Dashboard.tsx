@@ -4,8 +4,9 @@ import {
   Droplet, Moon, Pill, TrendingUp, AlertCircle, 
   CheckCircle2, Plus, Calendar, Activity,
   Leaf, Bell, X, Zap, ArrowRight, Star, Play, Camera, ShieldCheck,
-  ChevronLeft, ChevronRight, Baby, Heart, Sparkles, Target, Ruler, Gauge, BarChart3, Download, Smile, MessageSquare, Edit3
+  ChevronLeft, ChevronRight, Baby, Heart, Sparkles, Target, Ruler, Gauge, BarChart3, Download, Smile, MessageSquare, Edit3, Clock
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ResponsiveContainer, ComposedChart, Area, Line, CartesianGrid, XAxis, YAxis, Tooltip
 } from 'recharts';
@@ -13,6 +14,8 @@ import { UserProfile, HealthLog } from '../types';
 import { getDailyInspiration } from '../services/geminiService';
 import { NUTRITION_GUIDE, RECOVERY_DATABASE, COLORS, SLOGAN } from '../constants';
 import { translations } from '../translations';
+import OldGrannyWisdom from './OldGrannyWisdom';
+import DataHistory from './DataHistory';
 
 interface DashboardProps {
   profile: UserProfile;
@@ -25,8 +28,25 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
   const [inspiration, setInspiration] = useState(t.dashboard.inspiration);
+  const [showHistory, setShowHistory] = useState(false);
+  const [compliment, setCompliment] = useState('');
   const lastLog = logs[logs.length - 1];
   const theme = COLORS[profile.accent] || COLORS.PINK;
+
+  const compliments = [
+    "Your strength is quiet but undeniable.",
+    "There is a beautiful glow in your resilience.",
+    "The way you care for yourself is inspiring.",
+    "Your presence brings a gentle warmth to this circle.",
+    "Your smile holds so much love and power.",
+    "The softness in your eyes tells a story of courage.",
+    "Your hair looks lovely today, a crown of grace.",
+    "You are doing something incredible, every single day."
+  ];
+
+  useEffect(() => {
+    setCompliment(compliments[Math.floor(Math.random() * compliments.length)]);
+  }, []);
 
   // Pregnancy Progress Logic
   const isPregnant = profile.maternityStage.startsWith('Pregnant');
@@ -65,11 +85,11 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
 
   useEffect(() => {
     const fetchInspiration = async () => {
-      const msg = await getDailyInspiration(lastLog?.moodLevel || 5);
+      const msg = await getDailyInspiration(lastLog?.moodLevel || 5, profile);
       setInspiration(msg);
     };
     fetchInspiration();
-  }, [lastLog, lang]);
+  }, [lastLog, lang, profile]);
 
   const chartData = useMemo(() => {
     if (logs.length === 0) return [{ time: 'Today', mood: 5, pain: 2 }];
@@ -105,7 +125,10 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
 
             <div className="space-y-3">
               <h2 className="text-3xl lg:text-5xl font-bold tracking-tight text-white">{t.common.welcome}, {profile.name}</h2>
-              <p className="opacity-90 max-w-lg italic text-base lg:text-xl leading-relaxed font-medium text-white/90">"{inspiration}"</p>
+              <div className="flex items-center gap-2 text-white/80 animate-in fade-in slide-in-from-left-4 duration-1000 delay-300">
+                <Heart size={16} className="text-rose-300 fill-rose-300" />
+                <p className="text-sm lg:text-base font-medium italic">"{compliment}"</p>
+              </div>
               <div className="pt-4 flex flex-wrap gap-3 justify-center lg:justify-start">
                 <div className="flex items-center gap-2.5 bg-white/15 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
                   <ShieldCheck size={16} className="text-emerald-300" />
@@ -119,11 +142,33 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
             </div>
           </div>
           
-          <button onClick={onAddLog} className="bg-white/95 backdrop-blur-md px-10 py-5 rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 shrink-0 text-slate-900 text-sm lg:text-base border border-white">
-            <Plus size={20} strokeWidth={3} /> {t.dashboard.logMoment}
-          </button>
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+            <button 
+              onClick={onAddLog} 
+              className="bg-white/95 backdrop-blur-md px-10 py-5 rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3 shrink-0 text-slate-900 text-sm lg:text-base border border-white"
+            >
+              <Plus size={20} strokeWidth={3} /> {t.dashboard.logMoment}
+            </button>
+            <button 
+              onClick={() => setShowHistory(true)}
+              className="bg-white/10 backdrop-blur-md px-10 py-5 rounded-full font-bold shadow-xl hover:bg-white/20 transition-all flex items-center gap-3 shrink-0 text-white text-sm lg:text-base border border-white/20"
+            >
+              <BarChart3 size={20} /> Records History
+            </button>
+          </div>
         </div>
       </div>
+
+      <OldGrannyWisdom profile={profile} />
+
+      <AnimatePresence>
+        {showHistory && (
+          <DataHistory 
+            logs={logs} 
+            onClose={() => setShowHistory(false)} 
+          />
+        )}
+      </AnimatePresence>
 
       {isPregnant && gestationalAge && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -217,7 +262,18 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
         <div className="lg:col-span-2 bg-white/70 backdrop-blur-xl p-8 lg:p-12 rounded-[2.5rem] shadow-[0_10px_50px_rgba(0,0,0,0.02)] border border-white/60">
-          <div className="mb-8 lg:mb-12"><h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">{t.dashboard.healingPulse}</h3><p className="text-sm lg:text-base text-slate-400 font-medium opacity-80 mt-1">{t.dashboard.healingPulseSub}</p></div>
+          <div className="mb-8 lg:mb-12 flex justify-between items-start">
+            <div className="space-y-1">
+              <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">{t.dashboard.healingPulse}</h3>
+              <p className="text-sm lg:text-base text-slate-400 font-medium opacity-80 mt-1">{t.dashboard.healingPulseSub}</p>
+            </div>
+            <button 
+              onClick={() => setShowHistory(true)}
+              className="px-6 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2"
+            >
+              <Clock size={14} /> Past Records
+            </button>
+          </div>
           <div className="h-56 lg:h-80">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData}>

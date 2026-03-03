@@ -103,6 +103,7 @@ const App: React.FC = () => {
 
   const [logs, setLogs] = useState<HealthLog[]>([]);
   const [exerciseLogs, setExerciseLogs] = useState<ExerciseLog[]>([]);
+  const [lactationLogs, setLactationLogs] = useState<any[]>(profile.lactationLogs || []);
   const [triageMessages, setTriageMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
@@ -311,7 +312,7 @@ const App: React.FC = () => {
             {!isExpert && (
               <>
                 {currentView === 'dashboard' && profile.authenticated && <Dashboard profile={profile} logs={logs} onAddLog={() => setShowLogModal(true)} setView={setView} />}
-                {currentView === 'physical' && profile.authenticated && <CareJourney profile={profile} setProfile={setProfile} onToggleActivity={toggleActivity} activities={filteredActivities} exerciseLogs={exerciseLogs} setExerciseLogs={setExerciseLogs} logs={logs} onAddLog={() => setShowLogModal(true)} />}
+                {currentView === 'physical' && profile.authenticated && <CareJourney profile={profile} setProfile={setProfile} onToggleActivity={toggleActivity} activities={filteredActivities} exerciseLogs={exerciseLogs} setExerciseLogs={setExerciseLogs} logs={logs} onAddLog={() => setShowLogModal(true)} lactationLogs={lactationLogs} setLactationLogs={setLactationLogs} />}
                 {currentView === 'mental' && profile.authenticated && <MentalWellness profile={profile} messages={triageMessages} setMessages={setTriageMessages} onOpenJournal={() => setShowJournal(true)} />}
                 {currentView === 'education' && <Education profile={profile} />}
                 {currentView === 'momkart' && profile.authenticated && <MomKart profile={profile} />}

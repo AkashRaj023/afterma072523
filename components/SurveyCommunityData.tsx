@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Users, Heart, Sparkles, ShieldCheck, ArrowRight, 
   MessageSquare, Star, TrendingUp, Info, Globe, 
-  CheckCircle2, Lock, EyeOff, X, ChevronRight
+  CheckCircle2, Lock, EyeOff, X, ChevronRight, Calendar
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { COLORS } from '../constants';
@@ -51,7 +51,17 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
   });
 
   const handleSurveySubmit = () => {
-    alert("Thank you for contributing to the community wisdom! Your anonymized insights have been recorded.");
+    const newLog = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      recoveryRate: surveyData.recoveryRate,
+      mainChallenge: surveyData.mainChallenge,
+      supportLevel: surveyData.supportLevel
+    };
+    
+    // In a real app, we'd update the profile state here. 
+    // For this prototype, we'll simulate it by showing the alert.
+    alert("Gratitude for contributing to the collective wisdom! Anonymized insights have been recorded.");
     setShowSurvey(false);
     setSurveyStep(1);
   };
@@ -64,10 +74,10 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
           <span className="text-[10px] font-bold uppercase tracking-widest">Community Wisdom</span>
         </div>
         <h2 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-          Voices of Motherhood — Real Experiences, Real Wisdom.
+          Sisterhood of Mothers; By Mothers & Sisters, For You.
         </h2>
         <p className="text-slate-400 font-medium text-lg lg:text-xl leading-relaxed italic">
-          Anonymized, curated insights from thousands of unique journeys, helping us all heal together.
+          Anonymized, curated insights from thousands of unique journeys, helping sisters heal together within this circle.
         </p>
       </div>
 
@@ -83,7 +93,7 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
                 <div className="text-4xl font-black text-slate-900 tracking-tighter group-hover:scale-110 transition-transform">{item.stat}</div>
               </div>
               <p className="text-slate-500 font-medium leading-relaxed italic text-lg">
-                "{item.insight}"
+                "Anonymized, curated insights from thousands of unique journeys, helping sisters heal together within this circle."
               </p>
               <div className="pt-4 flex items-center gap-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
                 <EyeOff size={14} /> Anonymized Data Point
@@ -100,9 +110,9 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
-              <h3 className="text-3xl lg:text-5xl font-black tracking-tight leading-tight">Your voice matters.</h3>
+              <h3 className="text-3xl lg:text-5xl font-black tracking-tight leading-tight">Every voice matters.</h3>
               <p className="text-slate-400 font-medium text-lg leading-relaxed">
-                Contribute your experience to help other sisters. Your data is always anonymized and used only to improve our community's collective wisdom.
+                Contribute experiences to help other sisters. Data is always anonymized and used only to improve the collective wisdom of this circle.
               </p>
             </div>
             <div className="flex flex-wrap gap-6">
@@ -119,7 +129,7 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
               onClick={() => setShowSurvey(true)}
               className="px-10 py-5 bg-white text-slate-900 rounded-3xl font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
             >
-              Share Your Journey <ArrowRight size={18} />
+              Share the Journey <ArrowRight size={18} />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -145,14 +155,14 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
               
               <div className="space-y-3 text-center">
                  <div className="p-4 bg-emerald-50 text-emerald-600 rounded-3xl w-fit mx-auto mb-4"><MessageSquare size={32} /></div>
-                 <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Community Contribution</h3>
+                 <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Collective Contribution</h3>
                  <p className="text-sm text-slate-400 font-medium italic">Step {surveyStep} of 2: Helping sisters heal together.</p>
               </div>
 
               {surveyStep === 1 ? (
                 <div className="space-y-8">
                    <div className="space-y-4">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">How would you rate your recovery pace?</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">How is the recovery pace rated?</label>
                       <div className="flex justify-between px-2">
                          {[1,2,3,4,5,6,7,8,9,10].map(n => (
                            <button 
@@ -219,7 +229,7 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
                         className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">
-                        I understand that my responses are 100% anonymized and will be used to generate collective insights for the AfterMa community.
+                        It is understood that responses are 100% anonymized and will be used to generate collective insights for the AfterMa circle.
                       </p>
                    </div>
 
@@ -239,11 +249,34 @@ const SurveyCommunityData: React.FC<SurveyProps> = ({ profile }) => {
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto p-8 bg-slate-50 rounded-3xl border border-slate-100 flex gap-6">
-        <Info size={24} className="text-slate-400 shrink-0" />
-        <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">
-          Transparency Notice: All data presented in this section is aggregated from opt-in user surveys. We never store or display personally identifiable information (PII). Our goal is to provide a mirror of the community's collective strength.
-        </p>
+      <div className="max-w-2xl mx-auto p-8 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col gap-6">
+        <div className="flex gap-6">
+          <Info size={24} className="text-slate-400 shrink-0" />
+          <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">
+            Transparency Notice: All data presented in this section is aggregated from opt-in user surveys. We never store or display personally identifiable information (PII). Our goal is to provide a mirror of the community's collective strength.
+          </p>
+        </div>
+        
+        {profile.surveyLogs && profile.surveyLogs.length > 0 && (
+          <div className="pt-6 border-t border-slate-200">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+              <Calendar size={14} /> Past Contributions
+            </h4>
+            <div className="space-y-3">
+              {profile.surveyLogs.slice().reverse().map(log => (
+                <div key={log.id} className="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-slate-900">{new Date(log.timestamp).toLocaleDateString()}</p>
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{log.mainChallenge} • {log.supportLevel} Support</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">Pace: {log.recoveryRate}/10</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

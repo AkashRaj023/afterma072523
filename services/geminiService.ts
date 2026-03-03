@@ -36,10 +36,17 @@ export const getTriageAnalysis = async (symptoms: string[], profile: UserProfile
   }
 };
 
-export const getDailyInspiration = async (mood: number) => {
+export const getDailyInspiration = async (mood: number, profile: UserProfile) => {
   // Use gemini-3-flash-preview for basic text tasks like short validations.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Generate a short, calming, and validating 2-sentence inspiration for a new mother feeling a mood of ${mood}/10 (10 being great).`;
+  const prompt = `
+    Generate a short, grounded, and uplifting affirmation for a mother named ${profile.name}.
+    Stage: ${profile.maternityStage}. Mood: ${mood}/10.
+    Strictly 5-7 words maximum.
+    Tone: Warm, culturally familiar, gentle, and empowering.
+    Avoid "you" or "your". Use collective tones like "for us", "among sisters", or "within this circle".
+    Example: "Strength flows within this sisterhood circle."
+  `;
   
   try {
     const response = await ai.models.generateContent({
@@ -49,6 +56,6 @@ export const getDailyInspiration = async (mood: number) => {
     // Access the .text property directly.
     return response.text;
   } catch {
-    return "You are doing an amazing job. Take it one breath at a time.";
+    return "You are doing an amazing job, ${profile.name}. Take it one breath at a time.";
   }
 };

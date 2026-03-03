@@ -105,11 +105,32 @@ export interface ExerciseLog {
   completed: boolean;
 }
 
+export type ReproductiveCondition = 'PCOS' | 'PCOD' | 'Endometriosis' | 'Fibroids' | 'None' | 'Other';
+
+export interface LactationLog {
+  id: string;
+  timestamp: number;
+  type: 'breast' | 'pump';
+  side: 'left' | 'right' | 'both';
+  duration: number; // minutes
+  quantity?: number; // ml
+  babyResponse: 'satisfied' | 'fussy' | 'sleepy';
+  discomfortLevel: number; // 1-10
+}
+
 export interface JournalEntry {
   id: string;
   prompt: string;
   content: string;
   timestamp: number;
+}
+
+export interface SurveyLog {
+  id: string;
+  timestamp: number;
+  recoveryRate: number;
+  mainChallenge: string;
+  supportLevel: string;
 }
 
 export interface UserProfile {
@@ -137,6 +158,9 @@ export interface UserProfile {
   notifications: NotificationSettings;
   periodLogs: PeriodLog[];
   journalEntries?: JournalEntry[];
+  lactationLogs?: LactationLog[];
+  surveyLogs?: SurveyLog[];
+  reproductiveConditions?: ReproductiveCondition[];
   profilePicture?: string;
   verification?: VerificationData;
 }

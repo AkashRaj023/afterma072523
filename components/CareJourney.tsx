@@ -8,7 +8,7 @@ import {
   Sparkles, Baby, Search, X, Droplet, Ruler, Gauge, BarChart3,
   CheckCircle, Target, Smile, Edit3, Moon, Pill, Frown, Laugh
 } from 'lucide-react';
-import { UserProfile, RecoveryActivity, ExerciseLog, HealthLog } from '../types';
+import { UserProfile, RecoveryActivity, ExerciseLog, HealthLog, LactationLog } from '../types';
 import { COLORS } from '../constants';
 import { translations } from '../translations';
 
@@ -31,32 +31,45 @@ const CareJourney: React.FC<CareJourneyProps> = ({
   exerciseLogs, 
   setExerciseLogs,
   logs,
-  onAddLog
+  onAddLog,
+  lactationLogs,
+  setLactationLogs
 }) => {
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
-  const [activeTab, setActiveTab] = useState<'Journey' | 'PeriodLog' | 'HealthSummary'>('Journey');
+  const [activeTab, setActiveTab] = useState<'Journey' | 'PeriodLog' | 'HealthSummary' | 'LactationLog'>('Journey');
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyType, setHistoryType] = useState<'Period' | 'Lactation' | 'Exercise' | 'Health'>('Period');
   const [showGame, setShowGame] = useState(false);
   const [gameScore, setGameScore] = useState(0);
+  const [gameStreak, setGameStreak] = useState(0);
   const [gameTarget, setGameTarget] = useState('');
+  const [gamePrompt, setGamePrompt] = useState('');
   const [gameOptions, setGameOptions] = useState<string[]>([]);
 
   const startSymptomGame = () => {
-    const symptoms = ['Cramps', 'Bloating', 'Fatigue', 'Mood Swings', 'Back Pain', 'Headache'];
-    const target = symptoms[Math.floor(Math.random() * symptoms.length)];
-    const options = [...symptoms].sort(() => Math.random() - 0.5);
-    setGameTarget(target);
-    setGameOptions(options);
+    const challenges = [
+      { prompt: "How's your energy right now?", options: ['Radiant', 'Steady', 'Gentle', 'Resting'], target: 'Steady' },
+      { prompt: "What is your body whispering?", options: ['Thirst', 'Hunger', 'Rest', 'Movement'], target: 'Rest' },
+      { prompt: "Notice your breath. Is it...", options: ['Deep', 'Shallow', 'Steady', 'Rapid'], target: 'Deep' },
+      { prompt: "Any cravings today?", options: ['Sweet', 'Salty', 'Fresh', 'Warm'], target: 'Fresh' }
+    ];
+    const challenge = challenges[Math.floor(Math.random() * challenges.length)];
+    setGameTarget(challenge.target);
+    setGamePrompt(challenge.prompt);
+    setGameOptions(challenge.options.sort(() => Math.random() - 0.5));
     setShowGame(true);
   };
 
   const handleGameGuess = (guess: string) => {
     if (guess === gameTarget) {
       setGameScore(s => s + 10);
-      alert("Correct! You're in tune with your body.");
+      setGameStreak(s => s + 1);
       startSymptomGame();
     } else {
-      alert("Not quite, but every body is different! Try again.");
+      setGameStreak(0);
+      alert("Every body is different! Let's try another reflection.");
+      startSymptomGame();
     }
   };
   const [selectedActivity, setSelectedActivity] = useState<RecoveryActivity | null>(null);
@@ -82,6 +95,30 @@ const CareJourney: React.FC<CareJourneyProps> = ({
     symptoms: [],
     notes: ''
   });
+
+  const [lactationEntry, setLactationEntry] = useState<Partial<LactationLog>>({
+    type: 'breast',
+    side: 'both',
+    duration: 15,
+    quantity: 0,
+    babyResponse: 'satisfied',
+    discomfortLevel: 0
+  });
+
+  const handleSaveLactation = () => {
+    const newLog: LactationLog = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      type: lactationEntry.type || 'breast',
+      side: lactationEntry.side || 'both',
+      duration: lactationEntry.duration || 15,
+      quantity: lactationEntry.quantity,
+      babyResponse: lactationEntry.babyResponse || 'satisfied',
+      discomfortLevel: lactationEntry.discomfortLevel || 0
+    };
+    setLactationLogs(prev => [...prev, newLog]);
+    alert("Feeding session recorded successfully.");
+  };
 
   useEffect(() => {
     if (isTimerRunning) {
@@ -215,6 +252,14 @@ const CareJourney: React.FC<CareJourneyProps> = ({
           >
             <Droplet size={14} /> Period Log
           </button>
+          {isPostpartum && (
+            <button 
+              onClick={() => setActiveTab('LactationLog')}
+              className={`px-6 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'LactationLog' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900'}`}
+            >
+              <Baby size={14} /> Lactation Log
+            </button>
+          )}
           <button 
             onClick={() => setActiveTab('HealthSummary')}
             className={`px-6 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'HealthSummary' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900'}`}
@@ -225,16 +270,30 @@ const CareJourney: React.FC<CareJourneyProps> = ({
       </div>
 
       {activeTab === 'Journey' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 animate-in fade-in duration-500">
-          {activities.map((activity) => (
-            <ActivityCard 
-              key={activity.id} 
-              act={activity} 
-              theme={theme} 
-              isDone={profile.completedActivities.includes(activity.id)} 
-              onClick={() => handleStartActivity(activity)} 
-            />
-          ))}
+        <div className="space-y-10 animate-in fade-in duration-500">
+          <div className="flex justify-between items-end">
+            <div className="space-y-2">
+              <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Your Care Journey</h3>
+              <p className="text-slate-400 font-medium italic">Curated activities for your specific phase and recovery pace.</p>
+            </div>
+            <button 
+              onClick={() => { setHistoryType('Exercise'); setShowHistory(true); }}
+              className="px-6 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2"
+            >
+              <Clock size={14} /> Past Records
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {activities.map((activity) => (
+              <ActivityCard 
+                key={activity.id} 
+                act={activity} 
+                theme={theme} 
+                isDone={profile.completedActivities.includes(activity.id)} 
+                onClick={() => handleStartActivity(activity)} 
+              />
+            ))}
+          </div>
         </div>
       )}
 
@@ -243,12 +302,51 @@ const CareJourney: React.FC<CareJourneyProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 space-y-10">
               <div className="bg-white/70 backdrop-blur-xl p-10 lg:p-14 rounded-[3rem] border border-white/60 shadow-sm space-y-10">
-                <div className="space-y-2">
-                  <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Log Your Cycle</h3>
-                  <p className="text-slate-400 font-medium italic">Record your daily observations for precise clinical tracking.</p>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Log Your Cycle</h3>
+                    <p className="text-slate-400 font-medium italic">Record your daily observations for precise clinical tracking.</p>
+                  </div>
+                  <button 
+                    onClick={() => { setHistoryType('Period'); setShowHistory(true); }}
+                    className="px-6 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2"
+                  >
+                    <Clock size={14} /> Past Records
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Reproductive Conditions (Optional)</label>
+                    <div className="relative">
+                      <select 
+                        value={profile.reproductiveConditions?.[0] || 'None'}
+                        onChange={(e) => {
+                          const val = e.target.value as any;
+                          setProfile(prev => ({
+                            ...prev,
+                            reproductiveConditions: val === 'None' ? [] : [val]
+                          }));
+                        }}
+                        className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100 appearance-none"
+                      >
+                        <option value="None">No specific condition</option>
+                        <option value="PCOS">PCOS</option>
+                        <option value="PCOD">PCOD</option>
+                        <option value="Endometriosis">Endometriosis</option>
+                        <option value="Fibroids">Fibroids</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <ChevronRight size={16} className="rotate-90" />
+                      </div>
+                    </div>
+                    <p className="text-[9px] text-slate-400 italic px-2">
+                      <ShieldCheck size={10} className="inline mr-1 text-emerald-500" />
+                      Private & editable. Used only to personalize your insights.
+                    </p>
+                  </div>
+
                   <div className="space-y-4">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Observation Date</label>
                     <div className="flex items-center gap-4 p-5 bg-slate-50 border border-slate-100 rounded-2xl relative">
@@ -426,19 +524,29 @@ const CareJourney: React.FC<CareJourneyProps> = ({
                 
                 {!showGame ? (
                   <div className="text-center py-4 space-y-4">
-                     <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">Match the symptom to the feeling. A gentle way to stay connected.</p>
+                     <p className="text-[10px] text-slate-500 font-medium leading-relaxed italic">Mindful reflection through small interactive prompts. Stay in tune with your rhythm.</p>
+                     <div className="flex justify-center gap-4">
+                        <div className="text-center">
+                           <p className="text-xl font-black text-slate-900">{gameScore}</p>
+                           <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Points</p>
+                        </div>
+                        <div className="text-center">
+                           <p className="text-xl font-black text-amber-500">{gameStreak}</p>
+                           <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Streak</p>
+                        </div>
+                     </div>
                      <button 
                        onClick={startSymptomGame}
                        className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl"
                      >
-                       Start Playing
+                       Begin Reflection
                      </button>
                   </div>
                 ) : (
                   <div className="space-y-6 animate-in zoom-in-95 duration-300">
                      <div className="text-center space-y-2">
-                        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Find the match for:</p>
-                        <h4 className="text-xl font-black text-slate-900">{gameTarget}</h4>
+                        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Mindful Prompt:</p>
+                        <h4 className="text-lg font-black text-slate-900 leading-tight">{gamePrompt}</h4>
                      </div>
                      <div className="grid grid-cols-2 gap-2">
                         {gameOptions.map(opt => (
@@ -452,14 +560,156 @@ const CareJourney: React.FC<CareJourneyProps> = ({
                         ))}
                      </div>
                      <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Score: {gameScore}</span>
-                        <button onClick={() => setShowGame(false)} className="text-[9px] font-bold text-rose-500 uppercase tracking-widest hover:underline">Quit</button>
+                        <div className="flex gap-4">
+                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Score: {gameScore}</span>
+                           <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">Streak: {gameStreak}</span>
+                        </div>
+                        <button onClick={() => setShowGame(false)} className="text-[9px] font-bold text-rose-500 uppercase tracking-widest hover:underline">Close</button>
                      </div>
                   </div>
                 )}
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === 'LactationLog' && isPostpartum && (
+        <div className="space-y-10 animate-in fade-in duration-500">
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="lg:col-span-2 space-y-10">
+                 <div className="bg-white/70 backdrop-blur-xl p-10 lg:p-14 rounded-[3rem] border border-white/60 shadow-sm space-y-10">
+                    <div className="flex justify-between items-start">
+                       <div className="space-y-2">
+                          <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Lactation Log</h3>
+                          <p className="text-slate-400 font-medium italic">Track feeding patterns and baby's response for better care.</p>
+                       </div>
+                       <button 
+                         onClick={() => { setHistoryType('Lactation'); setShowHistory(true); }}
+                         className="px-6 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2"
+                       >
+                         <Clock size={14} /> Past Records
+                       </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Feeding Type</label>
+                          <div className="flex gap-2">
+                             {['breast', 'pump'].map(type => (
+                                <button 
+                                   key={type}
+                                   onClick={() => setLactationEntry(p => ({...p, type: type as any}))}
+                                   className={`flex-1 py-4 border rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${lactationEntry.type === type ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-100 text-slate-400 hover:border-slate-200'}`}
+                                >
+                                   {type}
+                                </button>
+                             ))}
+                          </div>
+                       </div>
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Side / Source</label>
+                          <div className="flex gap-2">
+                             {['left', 'right', 'both'].map(side => (
+                                <button 
+                                   key={side}
+                                   onClick={() => setLactationEntry(p => ({...p, side: side as any}))}
+                                   className={`flex-1 py-4 border rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${lactationEntry.side === side ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-slate-50 border-slate-100 text-slate-400 hover:border-slate-200'}`}
+                                >
+                                   {side}
+                                </button>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
+
+                    {lactationEntry.type === 'pump' && (
+                      <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Milk Quantity (ml/oz)</label>
+                        <div className="relative">
+                          <input 
+                            type="number" 
+                            value={lactationEntry.quantity || ''}
+                            onChange={e => setLactationEntry(p => ({...p, quantity: parseInt(e.target.value)}))}
+                            placeholder="Enter amount..." 
+                            className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100" 
+                          />
+                          <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">ml</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Duration (Minutes)</label>
+                          <input 
+                            type="number" 
+                            value={lactationEntry.duration || ''}
+                            onChange={e => setLactationEntry(p => ({...p, duration: parseInt(e.target.value)}))}
+                            placeholder="e.g. 15" 
+                            className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100" 
+                          />
+                       </div>
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Baby Response</label>
+                          <select 
+                            value={lactationEntry.babyResponse}
+                            onChange={e => setLactationEntry(p => ({...p, babyResponse: e.target.value as any}))}
+                            className="w-full p-5 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100 appearance-none"
+                          >
+                             <option value="satisfied">Satisfied</option>
+                             <option value="fussy">Fussy</option>
+                             <option value="sleepy">Sleepy</option>
+                          </select>
+                       </div>
+                    </div>
+
+                    <button 
+                      onClick={handleSaveLactation}
+                      className="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-bold text-sm uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3"
+                    >
+                       <Edit3 size={20} /> Save Feeding Log
+                    </button>
+                 </div>
+
+                 <div className="bg-white/70 backdrop-blur-xl p-10 lg:p-14 rounded-[3rem] border border-white/60 shadow-sm space-y-8">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Feeding History</h4>
+                    <div className="space-y-4">
+                       {[
+                          { date: 'Today, 10:30 AM', type: 'Breast', side: 'Left', duration: '15m', response: 'Satisfied' },
+                          { date: 'Today, 07:15 AM', type: 'Pump', side: 'Both', duration: '20m', response: '120ml' },
+                       ].map((log, i) => (
+                          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 flex items-center justify-between">
+                             <div className="flex items-center gap-4">
+                                <div className="p-3 bg-blue-50 text-blue-500 rounded-xl"><Baby size={20} /></div>
+                                <div>
+                                   <p className="font-bold text-slate-900">{log.date}</p>
+                                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{log.type} • {log.side} • {log.duration}</p>
+                                </div>
+                             </div>
+                             <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest">{log.response}</span>
+                          </div>
+                       ))}
+                    </div>
+                 </div>
+              </div>
+
+              <div className="space-y-10">
+                 <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                    <h4 className="font-bold text-slate-900 tracking-tight">Feeding Patterns</h4>
+                    <div className="space-y-4">
+                       <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Avg Duration</p>
+                          <p className="text-xl font-bold text-slate-900">18 Minutes</p>
+                       </div>
+                       <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Daily Frequency</p>
+                          <p className="text-xl font-bold text-slate-900">8 Times/Day</p>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
         </div>
       )}
 
@@ -471,12 +721,20 @@ const CareJourney: React.FC<CareJourneyProps> = ({
                 <h3 className="text-3xl font-bold text-slate-900 tracking-tight">Health Summary</h3>
                 <p className="text-slate-400 font-medium italic">Clinical analytics and readiness indices for your recovery.</p>
               </div>
-              <button 
-                onClick={downloadClinicalReport}
-                className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all"
-              >
-                <Download size={18} /> Structured PDF Report
-              </button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => { setHistoryType('Health'); setShowHistory(true); }}
+                  className="px-6 py-3 bg-slate-50 text-slate-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all flex items-center gap-2"
+                >
+                  <Clock size={14} /> Past Records
+                </button>
+                <button 
+                  onClick={downloadClinicalReport}
+                  className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all"
+                >
+                  <Download size={18} /> Structured PDF Report
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -543,6 +801,104 @@ const CareJourney: React.FC<CareJourneyProps> = ({
                    </div>
                 </div>
               )}
+           </div>
+        </div>
+      )}
+
+      {showHistory && (
+        <div className="fixed inset-0 z-[200] bg-slate-900/95 backdrop-blur-xl flex items-center justify-center p-6 animate-in zoom-in-95 duration-300">
+           <div className="max-w-2xl w-full bg-white rounded-[3rem] p-10 lg:p-14 space-y-10 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+              <button onClick={() => setShowHistory(false)} className="absolute top-8 right-8 p-2 text-slate-300 hover:text-slate-900 transition-colors"><X size={24} /></button>
+              
+              <div className="space-y-3 text-center">
+                 <div className="p-4 bg-slate-50 text-slate-900 rounded-3xl w-fit mx-auto mb-4"><Clock size={32} /></div>
+                 <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{historyType} History</h3>
+                 <p className="text-sm text-slate-400 font-medium italic">Reviewing past records for transparency and trust.</p>
+              </div>
+
+              <div className="space-y-4">
+                 {historyType === 'Period' && (
+                   <div className="space-y-4">
+                      {logs.filter(l => l.periodFlow && l.periodFlow !== 'None').length === 0 ? (
+                        <p className="text-center py-10 text-slate-400 font-medium">No period logs found.</p>
+                      ) : (
+                        logs.filter(l => l.periodFlow && l.periodFlow !== 'None').slice().reverse().map(l => (
+                          <div key={l.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                             <div>
+                                <p className="font-bold text-slate-900">{new Date(l.timestamp).toLocaleDateString()}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{l.periodFlow} Flow • {l.symptoms.join(', ')}</p>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-3 py-1 rounded-full uppercase tracking-widest">Cramps: {l.crampsLevel}</span>
+                             </div>
+                          </div>
+                        ))
+                      )}
+                   </div>
+                 )}
+
+                 {historyType === 'Lactation' && (
+                   <div className="space-y-4">
+                      {lactationLogs.length === 0 ? (
+                        <p className="text-center py-10 text-slate-400 font-medium">No feeding logs found.</p>
+                      ) : (
+                        lactationLogs.slice().reverse().map(l => (
+                          <div key={l.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                             <div>
+                                <p className="font-bold text-slate-900">{new Date(l.timestamp).toLocaleString()}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{l.type} • {l.side} • {l.duration}m</p>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                                   {l.type === 'pump' ? `${l.quantity}ml` : l.babyResponse}
+                                </span>
+                             </div>
+                          </div>
+                        ))
+                      )}
+                   </div>
+                 )}
+
+                 {historyType === 'Exercise' && (
+                   <div className="space-y-4">
+                      {exerciseLogs.length === 0 ? (
+                        <p className="text-center py-10 text-slate-400 font-medium">No activity logs found.</p>
+                      ) : (
+                        exerciseLogs.slice().reverse().map(l => (
+                          <div key={l.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                             <div>
+                                <p className="font-bold text-slate-900">{new Date(l.timestamp).toLocaleDateString()}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{l.activityName} • {l.duration}m</p>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Intensity: {l.intensity}</span>
+                             </div>
+                          </div>
+                        ))
+                      )}
+                   </div>
+                 )}
+
+                 {historyType === 'Health' && (
+                   <div className="space-y-4">
+                      {logs.length === 0 ? (
+                        <p className="text-center py-10 text-slate-400 font-medium">No health logs found.</p>
+                      ) : (
+                        logs.slice().reverse().map(l => (
+                          <div key={l.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                             <div>
+                                <p className="font-bold text-slate-900">{new Date(l.timestamp).toLocaleDateString()}</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pain: {l.painLevel} • Water: {l.waterIntake}L • Sleep: {l.sleepHours}h</p>
+                             </div>
+                             <div className="text-right">
+                                <span className="text-[10px] font-bold text-purple-500 bg-purple-50 px-3 py-1 rounded-full uppercase tracking-widest">Mood: {l.moodLevel}</span>
+                             </div>
+                          </div>
+                        ))
+                      )}
+                   </div>
+                 )}
+              </div>
            </div>
         </div>
       )}
