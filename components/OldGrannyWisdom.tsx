@@ -1,167 +1,227 @@
 
-import React, { useState, useMemo } from 'react';
-import { Sparkles, Heart, MessageSquare, X, Smile } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Sparkles, Heart, MessageSquare, X, Smile, ChevronUp, ChevronDown, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { UserProfile } from '../types';
+import { UserProfile, GrannyLog } from '../types';
 
-const TRIMESTER_QUESTIONS: Record<string, any[]> = {
-  'Pregnant - Trimester 1': [
-    {
-      question: "Is the little seed making its presence felt with a bit of morning magic?",
-      reactions: {
-        yes: "Ah, the first signs of life. Within this circle, such moments are cherished as the start of a beautiful path.",
-        no: "A quiet beginning is a grace. Every journey within this circle has its own rhythm.",
-      }
-    },
-    {
-      question: "Has a moment been taken to simply listen to the body's whispers today?",
-      reactions: {
-        yes: "Good. Listening to the body is how strength is found for the days ahead.",
-        no: "A quiet moment now can bring peace. The body knows the way.",
-      }
-    }
-  ],
-  'Pregnant - Trimester 2': [
-    {
-      question: "Is the glow of motherhood beginning to shine through?",
-      reactions: {
-        yes: "The light of motherhood is a beautiful sight. It brings warmth to all in this circle.",
-        no: "Beauty is found in the quiet strength of this journey. It is always there.",
-      }
-    },
-    {
-      question: "Are the first gentle movements being felt within?",
-      reactions: {
-        yes: "A tiny dancer! Such joy is shared among sisters when life makes itself known.",
-        no: "Patience is a mother's virtue. The time for meeting will come soon enough.",
-      }
-    }
-  ],
-  'Pregnant - Trimester 3': [
-    {
-      question: "Is the weight of the journey feeling heavy today?",
-      reactions: {
-        yes: "The final steps are often the most demanding. Lean on the collective strength of this circle.",
-        no: "Strength is found in the anticipation. The finish line is near.",
-      }
-    },
-    {
-      question: "Are preparations for the new arrival bringing a sense of peace?",
-      reactions: {
-        yes: "Building the nest is a sacred task. It prepares the heart as much as the home.",
-        no: "Take it one breath at a time. Everything will find its place in due time.",
-      }
-    }
-  ]
-};
+interface Question {
+  id: string;
+  text: string;
+  type: 'stepper' | 'emoji' | 'options' | 'slider';
+  options?: string[];
+  encouragement: string;
+}
+
+const QUESTIONS: Question[] = [
+  {
+    id: 'kicks',
+    text: "How many gentle baby kicks have been felt today?",
+    type: 'stepper',
+    encouragement: "Little kicks, big joy! Each one is a tiny hello."
+  },
+  {
+    id: 'glow',
+    text: "Is that beautiful pregnancy glow shining through today?",
+    type: 'emoji',
+    encouragement: "The light of motherhood looks lovely on you."
+  },
+  {
+    id: 'energy',
+    text: "How is the body's energy feeling in this moment?",
+    type: 'slider',
+    encouragement: "Resting is just as productive as doing. Be gentle with yourself."
+  },
+  {
+    id: 'cravings',
+    text: "Have any special cravings appeared for the little one today?",
+    type: 'options',
+    options: ['Yes, very much!', 'A little bit', 'Not today'],
+    encouragement: "The body knows exactly what it needs. Enjoy every bite."
+  }
+];
 
 interface OldGrannyWisdomProps {
   profile: UserProfile;
+  onSaveLog: (log: GrannyLog) => void;
 }
 
-const OldGrannyWisdom: React.FC<OldGrannyWisdomProps> = ({ profile }) => {
-  const questions = useMemo(() => {
-    return TRIMESTER_QUESTIONS[profile.maternityStage] || [];
+const OldGrannyWisdom: React.FC<OldGrannyWisdomProps> = ({ profile, onSaveLog }) => {
+  // Only show for Pregnancy Trimester 1, 2, or 3
+  const isVisible = useMemo(() => {
+    const stages = ['Pregnant-T1', 'Pregnant-T2', 'Pregnant-T3'];
+    return stages.includes(profile.maternityStage);
   }, [profile.maternityStage]);
 
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [answer, setAnswer] = useState('');
-  const [reaction, setReaction] = useState<string | null>(null);
+  // Rotate question daily based on date
+  const dailyQuestion = useMemo(() => {
+    const day = new Date().getDate();
+    return QUESTIONS[day % QUESTIONS.length];
+  }, []);
+
+  const [value, setValue] = useState<any>(dailyQuestion.type === 'stepper' ? 0 : dailyQuestion.type === 'slider' ? 5 : '');
+  const [submitted, setSubmitted] = useState(false);
   const [show, setShow] = useState(true);
 
-  const handleAnswer = (val: string) => {
-    if (!questions[currentIdx]) return;
-    const q = questions[currentIdx];
-    let r = "";
-    
-    if (val.toLowerCase().includes('yes') || val.toLowerCase().includes('yeah') || val.toLowerCase().includes('sure')) {
-      r = q.reactions.yes;
-    } else {
-      r = q.reactions.no;
+  // Check if already submitted today
+  useEffect(() => {
+    const lastSubmission = localStorage.getItem(`granny_checkin_${new Date().toDateString()}`);
+    if (lastSubmission) {
+      setSubmitted(true);
     }
+  }, []);
 
-    setReaction(r);
+  const handleSubmit = () => {
+    const log: GrannyLog = {
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: Date.now(),
+      question: dailyQuestion.text,
+      answer: value,
+      reaction: dailyQuestion.encouragement
+    };
+    
+    onSaveLog(log);
+    setSubmitted(true);
+    localStorage.setItem(`granny_checkin_${new Date().toDateString()}`, 'true');
   };
 
-  const nextQuestion = () => {
-    setReaction(null);
-    setAnswer('');
-    setCurrentIdx((prev) => (prev + 1) % questions.length);
-  };
-
-  if (!show || questions.length === 0) return null;
+  if (!isVisible || !show) return null;
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-stone-50/40 backdrop-blur-md border border-stone-100 rounded-[2.5rem] p-8 mb-12 relative overflow-hidden group shadow-sm"
+      className="bg-[#FFF9F5] border border-[#F3E5D8] rounded-[2.5rem] p-8 lg:p-10 mb-12 relative overflow-hidden shadow-sm"
     >
-      <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={() => setShow(false)} className="text-stone-300 hover:text-stone-500 transition-colors"><X size={18} /></button>
-      </div>
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#8B5E3C 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
-        <div className="h-20 w-20 bg-stone-100/50 rounded-3xl flex items-center justify-center shrink-0 shadow-inner border border-stone-200/50">
-          <Sparkles className="text-stone-400" size={36} />
-        </div>
-        
-        <div className="flex-1 space-y-6">
-          <div className="space-y-2">
-            <h4 className="text-stone-500 font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center md:justify-start gap-3">
-              Old Granny's Wisdom
-              <span className="h-1.5 w-1.5 rounded-full bg-stone-300 animate-pulse" />
-            </h4>
-            <p className="text-stone-800 font-medium italic text-lg leading-relaxed">
-              "{questions[currentIdx].question}"
-            </p>
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 bg-[#F3E5D8] rounded-2xl flex items-center justify-center text-[#8B5E3C]">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-[#5D4037] tracking-tight">Granny’s Gentle Check-In</h3>
+              <p className="text-[10px] font-bold text-[#A1887F] uppercase tracking-widest">A moment of nostalgic care</p>
+            </div>
           </div>
+          <button onClick={() => setShow(false)} className="text-[#D7CCC8] hover:text-[#A1887F] transition-colors p-2">
+            <X size={20} />
+          </button>
+        </div>
 
-          <AnimatePresence mode="wait">
-            {!reaction ? (
-              <motion.div 
-                key="input"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto md:mx-0"
-              >
-                <input 
-                  type="text"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  placeholder="Share a thought..."
-                  className="flex-1 bg-white/40 border border-stone-200 rounded-2xl px-6 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-200 transition-all placeholder:text-stone-300"
-                  onKeyDown={(e) => e.key === 'Enter' && handleAnswer(answer)}
-                />
-                <button 
-                  onClick={() => handleAnswer(answer)}
-                  className="px-8 py-3 bg-stone-800 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-stone-900 transition-all shadow-lg shadow-stone-900/10"
-                >
-                  Share
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="reaction"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <div className="p-6 bg-white/60 rounded-3xl border border-stone-100 shadow-sm">
-                  <p className="text-stone-700 font-medium text-base leading-relaxed italic">
-                    "{reaction}"
-                  </p>
+        <AnimatePresence mode="wait">
+          {!submitted ? (
+            <motion.div 
+              key="question"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-8"
+            >
+              <p className="text-lg lg:text-xl text-[#5D4037] font-medium italic leading-relaxed">
+                "{dailyQuestion.text}"
+              </p>
+
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-1 w-full">
+                  {dailyQuestion.type === 'stepper' && (
+                    <div className="flex items-center gap-4 bg-white/60 rounded-2xl p-2 border border-[#F3E5D8] w-fit">
+                      <button 
+                        onClick={() => setValue(Math.max(0, value - 1))}
+                        className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#8B5E3C] hover:bg-[#F3E5D8] transition-colors"
+                      >
+                        <ChevronDown size={20} />
+                      </button>
+                      <span className="text-2xl font-bold text-[#5D4037] w-12 text-center">{value}</span>
+                      <button 
+                        onClick={() => setValue(value + 1)}
+                        className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#8B5E3C] hover:bg-[#F3E5D8] transition-colors"
+                      >
+                        <ChevronUp size={20} />
+                      </button>
+                    </div>
+                  )}
+
+                  {dailyQuestion.type === 'emoji' && (
+                    <div className="flex gap-4">
+                      {['✨', '🌸', '🌟', '💖'].map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => setValue(emoji)}
+                          className={`h-16 w-16 rounded-2xl text-3xl flex items-center justify-center transition-all ${value === emoji ? 'bg-[#F3E5D8] scale-110 shadow-md' : 'bg-white/60 hover:bg-white'}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {dailyQuestion.type === 'options' && (
+                    <div className="flex flex-wrap gap-3">
+                      {dailyQuestion.options?.map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => setValue(opt)}
+                          className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all ${value === opt ? 'bg-[#8B5E3C] text-white shadow-lg' : 'bg-white/60 text-[#8B5E3C] border border-[#F3E5D8] hover:bg-white'}`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {dailyQuestion.type === 'slider' && (
+                    <div className="space-y-4 max-w-md">
+                      <input 
+                        type="range" 
+                        min="1" 
+                        max="10" 
+                        value={value} 
+                        onChange={(e) => setValue(parseInt(e.target.value))}
+                        className="w-full h-2 bg-[#F3E5D8] rounded-lg appearance-none cursor-pointer accent-[#8B5E3C]"
+                      />
+                      <div className="flex justify-between text-[10px] font-bold text-[#A1887F] uppercase tracking-widest">
+                        <span>Resting</span>
+                        <span>Full of Life</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
                 <button 
-                  onClick={nextQuestion}
-                  className="text-stone-400 font-bold text-[10px] uppercase tracking-widest flex items-center justify-center md:justify-start gap-3 hover:text-stone-600 transition-all group/btn"
+                  onClick={handleSubmit}
+                  disabled={value === ''}
+                  className="w-full md:w-auto px-10 py-4 bg-[#8B5E3C] text-white rounded-2xl font-bold shadow-lg shadow-[#8B5E3C]/20 hover:bg-[#6D4C41] transition-all active:scale-95 disabled:opacity-50"
                 >
-                  Seek another whisper <Smile size={16} className="group-hover/btn:rotate-12 transition-transform" />
+                  Share with Nani
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="encouragement"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center text-center space-y-6 py-4"
+            >
+              <div className="h-20 w-20 bg-[#F3E5D8] rounded-full flex items-center justify-center text-[#8B5E3C] animate-bounce-slow">
+                <Heart size={40} fill="currentColor" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-2xl font-bold text-[#5D4037] italic">
+                  "{dailyQuestion.encouragement}"
+                </p>
+                <p className="text-sm text-[#A1887F] font-medium">Growing stronger every day within this circle.</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mt-8 pt-6 border-t border-[#F3E5D8]/50 flex items-center gap-2 text-[#A1887F]">
+          <Info size={14} />
+          <p className="text-[10px] font-medium italic">These gentle whispers remain safely within your personal records history.</p>
         </div>
       </div>
     </motion.div>

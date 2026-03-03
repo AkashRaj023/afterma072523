@@ -133,6 +133,14 @@ export interface SurveyLog {
   supportLevel: string;
 }
 
+export interface GrannyLog {
+  id: string;
+  timestamp: number;
+  question: string;
+  answer: string | number;
+  reaction: string;
+}
+
 export interface UserProfile {
   name: string;
   age: number;
@@ -163,6 +171,7 @@ export interface UserProfile {
   reproductiveConditions?: ReproductiveCondition[];
   profilePicture?: string;
   verification?: VerificationData;
+  grannyLogs?: GrannyLog[];
 }
 
 export interface HealthLog {

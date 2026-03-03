@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { AppView, UserProfile, HealthLog, RecoveryActivity, RecoveryPhase, Appointment, CommunityCircle, PeriodLog, MaternityStage, UserRole, ChatMessage, ExerciseLog } from './types';
+import { AppView, UserProfile, HealthLog, RecoveryActivity, RecoveryPhase, Appointment, CommunityCircle, PeriodLog, MaternityStage, UserRole, ChatMessage, ExerciseLog, GrannyLog } from './types';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import CareJourney from './components/CareJourney';
@@ -200,6 +200,14 @@ const App: React.FC = () => {
     }
   };
 
+  const handleAddGrannyLog = (log: GrannyLog) => {
+    setProfile(prev => ({
+      ...prev,
+      grannyLogs: [log, ...(prev.grannyLogs || [])]
+    }));
+    addNotification("Granny Check-In", "Your gentle whispers have been recorded.");
+  };
+
   const filteredActivities = useMemo(() => {
     return RECOVERY_DATABASE
       .filter(a => {
@@ -311,7 +319,7 @@ const App: React.FC = () => {
             {/* Mother Views - Restricted for Experts */}
             {!isExpert && (
               <>
-                {currentView === 'dashboard' && profile.authenticated && <Dashboard profile={profile} logs={logs} onAddLog={() => setShowLogModal(true)} setView={setView} />}
+                {currentView === 'dashboard' && profile.authenticated && <Dashboard profile={profile} logs={logs} onAddLog={() => setShowLogModal(true)} setView={setView} onAddGrannyLog={handleAddGrannyLog} />}
                 {currentView === 'physical' && profile.authenticated && <CareJourney profile={profile} setProfile={setProfile} onToggleActivity={toggleActivity} activities={filteredActivities} exerciseLogs={exerciseLogs} setExerciseLogs={setExerciseLogs} logs={logs} onAddLog={() => setShowLogModal(true)} lactationLogs={lactationLogs} setLactationLogs={setLactationLogs} />}
                 {currentView === 'mental' && profile.authenticated && <MentalWellness profile={profile} messages={triageMessages} setMessages={setTriageMessages} onOpenJournal={() => setShowJournal(true)} />}
                 {currentView === 'education' && <Education profile={profile} />}

@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   ResponsiveContainer, ComposedChart, Area, Line, CartesianGrid, XAxis, YAxis, Tooltip
 } from 'recharts';
-import { UserProfile, HealthLog } from '../types';
+import { UserProfile, HealthLog, GrannyLog } from '../types';
 import { getDailyInspiration } from '../services/geminiService';
 import { NUTRITION_GUIDE, RECOVERY_DATABASE, COLORS, SLOGAN } from '../constants';
 import { translations } from '../translations';
@@ -22,9 +22,10 @@ interface DashboardProps {
   logs: HealthLog[];
   onAddLog: () => void;
   setView: (view: any) => void;
+  onAddGrannyLog: (log: GrannyLog) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView }) => {
+const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView, onAddGrannyLog }) => {
   const lang = profile.journeySettings.language || 'english';
   const t = translations[lang];
   const [inspiration, setInspiration] = useState(t.dashboard.inspiration);
@@ -159,12 +160,13 @@ const Dashboard: React.FC<DashboardProps> = ({ profile, logs, onAddLog, setView 
         </div>
       </div>
 
-      <OldGrannyWisdom profile={profile} />
+      <OldGrannyWisdom profile={profile} onSaveLog={onAddGrannyLog} />
 
       <AnimatePresence>
         {showHistory && (
           <DataHistory 
             logs={logs} 
+            profile={profile}
             onClose={() => setShowHistory(false)} 
           />
         )}
