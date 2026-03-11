@@ -63,35 +63,35 @@ export const EPDS_QUESTIONS = [
 ];
 
 export const STORE_ITEMS: StoreItem[] = [
-  // Recovery (6)
-  { id: 'p1', name: 'Organic Nipple Balm', brand: 'Mamaearth', category: 'Recovery', price: 450, image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=400', description: 'Soothes and protects sensitive skin.', rating: 4.8 },
-  { id: 'p2', name: 'Cotton Belly Wrap', brand: 'FirstCry', category: 'Recovery', price: 1200, image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=400', description: 'Comfortable support for postpartum core.', rating: 4.9 },
-  { id: 'p3', name: 'Witch Hazel Pads', brand: 'FridaMom', category: 'Recovery', price: 899, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400', description: 'Instant cooling relief for perineal healing.', rating: 4.7 },
-  { id: 'p4', name: 'Peri Bottle', brand: 'Upside Down', category: 'Recovery', price: 499, image: 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=400', description: 'Ergonomic cleansing during recovery.', rating: 4.6 },
-  { id: 'p5', name: 'Sitz Bath Soak', brand: 'The Moms Co', category: 'Recovery', price: 350, image: 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?auto=format&fit=crop&q=80&w=400', description: 'Epsom salts with essential oils.', rating: 4.8 },
-  { id: 'p6', name: 'Scar Silicone Tape', brand: 'Mederma', category: 'Recovery', price: 1500, image: 'https://images.unsplash.com/photo-1583946099379-f9c9cb8bc030?auto=format&fit=crop&q=80&w=400', description: 'Advanced C-Section scar management.', rating: 4.5 },
+  // Postpartum Recovery (6)
+  { id: 'p1', name: 'Organic Nipple Balm', brand: 'Mamaearth', category: 'Lactation Support', price: 450, image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=400', description: 'Soothes and protects sensitive skin.', rating: 4.8, trustMarker: 'Sister Approved' },
+  { id: 'p2', name: 'Cotton Belly Wrap', brand: 'FirstCry', category: 'Postpartum Recovery', price: 1200, image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&q=80&w=400', description: 'Comfortable support for postpartum core.', rating: 4.9, trustMarker: 'Verified by AfterMa' },
+  { id: 'p3', name: 'Witch Hazel Pads', brand: 'FridaMom', category: 'Postpartum Recovery', price: 899, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400', description: 'Instant cooling relief for perineal healing.', rating: 4.7, trustMarker: 'Verified by AfterMa' },
+  { id: 'p4', name: 'Peri Bottle', brand: 'Upside Down', category: 'Postpartum Recovery', price: 499, image: 'https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&q=80&w=400', description: 'Ergonomic cleansing during recovery.', rating: 4.6, trustMarker: 'Sister Approved' },
+  { id: 'p5', name: 'Sitz Bath Soak', brand: 'The Moms Co', category: 'Postpartum Recovery', price: 350, image: 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?auto=format&fit=crop&q=80&w=400', description: 'Epsom salts with essential oils.', rating: 4.8, trustMarker: 'Local Women-Made' },
+  { id: 'p6', name: 'Scar Silicone Tape', brand: 'Mederma', category: 'Postpartum Recovery', price: 1500, image: 'https://images.unsplash.com/photo-1583946099379-f9c9cb8bc030?auto=format&fit=crop&q=80&w=400', description: 'Advanced C-Section scar management.', rating: 4.5, trustMarker: 'Recommended by Experts' },
   
-  // Pregnancy Essentials (4)
-  { id: 'mat1', name: 'Support Belt Pro', brand: 'Tynor', category: 'Maternity Care', price: 1450, image: 'https://images.unsplash.com/photo-1511910849309-0dffb8785146?auto=format&fit=crop&q=80&w=400', description: 'Trimester 3 pelvic and back relief.', rating: 4.7 },
-  { id: 'mat2', name: 'Pregnancy Leggings', brand: 'Zivame', category: 'Maternity Care', price: 999, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400', description: 'High-waisted over-the-bump stretch.', rating: 4.8 },
-  { id: 'mat3', name: 'Maternity Nursing Bra', brand: 'Enamor', category: 'Maternity Care', price: 850, image: 'https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&q=80&w=400', description: 'Seamless comfort for sensitive skin.', rating: 4.9 },
-  { id: 'mat4', name: 'Compression Socks', brand: 'HealthShakti', category: 'Maternity Care', price: 650, image: 'https://images.unsplash.com/photo-1582719202047-76d3432ee323?auto=format&fit=crop&q=80&w=400', description: 'Reduces leg swelling in T3.', rating: 4.4 },
+  // Comfort Care (4)
+  { id: 'mat1', name: 'Support Belt Pro', brand: 'Tynor', category: 'Comfort Care', price: 1450, image: 'https://images.unsplash.com/photo-1511910849309-0dffb8785146?auto=format&fit=crop&q=80&w=400', description: 'Trimester 3 pelvic and back relief.', rating: 4.7, trustMarker: 'Verified by AfterMa' },
+  { id: 'mat2', name: 'Pregnancy Leggings', brand: 'Zivame', category: 'Comfort Care', price: 999, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400', description: 'High-waisted over-the-bump stretch.', rating: 4.8, trustMarker: 'Sister Approved' },
+  { id: 'mat3', name: 'Maternity Nursing Bra', brand: 'Enamor', category: 'Comfort Care', price: 850, image: 'https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?auto=format&fit=crop&q=80&w=400', description: 'Seamless comfort for sensitive skin.', rating: 4.9, trustMarker: 'Sister Approved' },
+  { id: 'mat4', name: 'Compression Socks', brand: 'HealthShakti', category: 'Comfort Care', price: 650, image: 'https://images.unsplash.com/photo-1582719202047-76d3432ee323?auto=format&fit=crop&q=80&w=400', description: 'Reduces leg swelling in T3.', rating: 4.4, trustMarker: 'Local Women-Made' },
 
   // Nutrition (4)
-  { id: 'n1', name: 'Prenatal Multivitamin', brand: 'HealthKart', category: 'Nutrition', price: 850, image: 'https://images.unsplash.com/photo-1550573105-158674c6bb7a?auto=format&fit=crop&q=80&w=400', description: 'DHA and Folic acid optimized.', rating: 4.9 },
-  { id: 'n2', name: 'Lactation Cookies', brand: 'MamaFix', category: 'Nutrition', price: 550, image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=400', description: 'Oats, flaxseed and fenugreek blend.', rating: 4.6 },
-  { id: 'n3', name: 'Herbal Infusion Tea', brand: 'TeaCurry', category: 'Nutrition', price: 399, image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=400', description: 'Morning sickness relief blend.', rating: 4.5 },
-  { id: 'n4', name: 'Organic Ghee', brand: 'Amul', category: 'Nutrition', price: 650, image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&q=80&w=400', description: 'Traditional healthy fats for healing.', rating: 4.9 },
+  { id: 'n1', name: 'Prenatal Multivitamin', brand: 'HealthKart', category: 'Nutrition', price: 850, image: 'https://images.unsplash.com/photo-1550573105-158674c6bb7a?auto=format&fit=crop&q=80&w=400', description: 'DHA and Folic acid optimized.', rating: 4.9, trustMarker: 'Recommended by Experts' },
+  { id: 'n2', name: 'Lactation Cookies', brand: 'MamaFix', category: 'Lactation Support', price: 550, image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=400', description: 'Oats, flaxseed and fenugreek blend.', rating: 4.6, trustMarker: 'Local Women-Made' },
+  { id: 'n3', name: 'Herbal Infusion Tea', brand: 'TeaCurry', category: 'Nutrition', price: 399, image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=400', description: 'Morning sickness relief blend.', rating: 4.5, trustMarker: 'Local Women-Made' },
+  { id: 'n4', name: 'Organic Ghee', brand: 'Amul', category: 'Nutrition', price: 650, image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&q=80&w=400', description: 'Traditional healthy fats for healing.', rating: 4.9, trustMarker: 'Sister Approved' },
 
-  // Baby Care (3)
-  { id: 'b1', name: 'Bamboo Diapers', brand: 'SuperBottoms', category: 'Baby Care', price: 999, image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=400', description: 'Eco-friendly and chemical-free.', rating: 4.8 },
-  { id: 'b2', name: 'Safe-Touch Lotion', brand: 'Sebamed', category: 'Baby Care', price: 750, image: 'https://images.unsplash.com/photo-1512496011931-6213467c3f9a?auto=format&fit=crop&q=80&w=400', description: 'pH 5.5 clinically tested for newborns.', rating: 4.7 },
-  { id: 'b3', name: 'Swaddle Wrap Set', brand: 'LuvLap', category: 'Baby Care', price: 1100, image: 'https://images.unsplash.com/photo-1555133539-dfa3b50e1611?auto=format&fit=crop&q=80&w=400', description: 'Soft breathable organic cotton.', rating: 4.9 },
+  // Baby Essentials (3)
+  { id: 'b1', name: 'Bamboo Diapers', brand: 'SuperBottoms', category: 'Baby Essentials', price: 999, image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=400', description: 'Eco-friendly and chemical-free.', rating: 4.8, trustMarker: 'Local Women-Made' },
+  { id: 'b2', name: 'Safe-Touch Lotion', brand: 'Sebamed', category: 'Baby Essentials', price: 750, image: 'https://images.unsplash.com/photo-1512496011931-6213467c3f9a?auto=format&fit=crop&q=80&w=400', description: 'pH 5.5 clinically tested for newborns.', rating: 4.7, trustMarker: 'Recommended by Experts' },
+  { id: 'b3', name: 'Swaddle Wrap Set', brand: 'LuvLap', category: 'Baby Essentials', price: 1100, image: 'https://images.unsplash.com/photo-1555133539-dfa3b50e1611?auto=format&fit=crop&q=80&w=400', description: 'Soft breathable organic cotton.', rating: 4.9, trustMarker: 'Sister Approved' },
 
-  // Devices (3)
-  { id: 'd1', name: 'Electric Breast Pump', brand: 'Philips Avent', category: 'Devices', price: 8500, image: 'https://images.unsplash.com/photo-1594498639139-e483980f8451?auto=format&fit=crop&q=80&w=400', description: 'Quiet and efficient multi-speed.', rating: 4.8 },
-  { id: 'd2', name: 'Smart Baby Monitor', brand: 'Motorola', category: 'Devices', price: 4500, image: 'https://images.unsplash.com/photo-1544256718-3bcf237f3974?auto=format&fit=crop&q=80&w=400', description: 'Full HD video with night vision.', rating: 4.5 },
-  { id: 'd3', name: 'Infrared Thermometer', brand: 'Omron', category: 'Devices', price: 1800, image: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&q=80&w=400', description: 'Non-contact instant reading.', rating: 4.6 }
+  // Wellness Tools (3)
+  { id: 'd1', name: 'Electric Breast Pump', brand: 'Philips Avent', category: 'Lactation Support', price: 8500, image: 'https://images.unsplash.com/photo-1594498639139-e483980f8451?auto=format&fit=crop&q=80&w=400', description: 'Quiet and efficient multi-speed.', rating: 4.8, trustMarker: 'Verified by AfterMa' },
+  { id: 'd2', name: 'Smart Baby Monitor', brand: 'Motorola', category: 'Wellness Tools', price: 4500, image: 'https://images.unsplash.com/photo-1544256718-3bcf237f3974?auto=format&fit=crop&q=80&w=400', description: 'Full HD video with night vision.', rating: 4.5, trustMarker: 'Verified by AfterMa' },
+  { id: 'd3', name: 'Infrared Thermometer', brand: 'Omron', category: 'Wellness Tools', price: 1800, image: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&q=80&w=400', description: 'Non-contact instant reading.', rating: 4.6, trustMarker: 'Verified by AfterMa' }
 ];
 
 export const EXPERT_DATA = [

@@ -68,11 +68,12 @@ export interface StoreItem {
   id: string;
   name: string;
   brand: string;
-  category: 'Baby Care' | 'Recovery' | 'Nutrition' | 'Devices' | 'Maternity Care';
+  category: 'Postpartum Recovery' | 'Lactation Support' | 'Nutrition' | 'Baby Essentials' | 'Comfort Care' | 'Wellness Tools';
   price: number;
   image: string;
   description: string;
   rating: number;
+  trustMarker?: 'Verified by AfterMa' | 'Sister Approved' | 'Local Women-Made' | 'Recommended by Experts';
 }
 
 export interface CartItem extends StoreItem {
